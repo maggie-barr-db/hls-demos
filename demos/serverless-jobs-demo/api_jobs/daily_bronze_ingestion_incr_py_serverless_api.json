@@ -13,7 +13,7 @@
           "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
         ]
       },
-      "environment_key": "Default"
+      "environment_key": "serverless_environment_demo"
     },
     {
       "task_key": "bronze_archive",
@@ -30,7 +30,7 @@
           "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
         ]
       },
-      "environment_key": "Default"
+      "environment_key": "serverless_environment_demo"
     }
   ],
   "queue": {
@@ -38,9 +38,12 @@
   },
   "environments": [
     {
-      "environment_key": "Default",
+      "environment_key": "serverless_environment_demo",
       "spec": {
-        "client": "4"
+        "client": "4",
+        "dependencies": [
+          "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
+        ]
       }
     }
   ],

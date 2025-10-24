@@ -155,7 +155,7 @@ resources:
               - maggiedatabricksterraform_dbw
               - --base_volume_path
               - /Volumes/maggiedatabricksterraform_dbw/synthea/landing
-          environment_key: Default
+          environment_key: serverless_environment_demo
         - task_key: bronze_archive
           depends_on:
             - task_key: bronze_ingest
@@ -164,13 +164,15 @@ resources:
             parameters:
               - --base_volume_path
               - /Volumes/maggiedatabricksterraform_dbw/synthea/landing
-          environment_key: Default
+          environment_key: serverless_environment_demo
       queue:
         enabled: true
       environments:
-        - environment_key: Default
+        - environment_key: serverless_environment_demo
           spec:
             client: "4"
+            dependencies:
+              - "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
       performance_target: PERFORMANCE_OPTIMIZED
     
     daily_silver_load_incr_py_serverless_dab:
@@ -187,7 +189,7 @@ resources:
               - --catalog_name
               - ${var.catalog_name}
           libraries: []
-          environment_key: Default
+          environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
         
         - task_key: load_patient_encounters_silver
@@ -197,7 +199,7 @@ resources:
               - --catalog_name
               - ${var.catalog_name}
           libraries: []
-          environment_key: Default
+          environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
         
         - task_key: load_medications_silver
@@ -207,7 +209,7 @@ resources:
               - --catalog_name
               - ${var.catalog_name}
           libraries: []
-          environment_key: Default
+          environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
         
         - task_key: load_procedures_silver
@@ -217,7 +219,7 @@ resources:
               - --catalog_name
               - ${var.catalog_name}
           libraries: []
-          environment_key: Default
+          environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
         
         - task_key: load_member_monthly_snapshot_gold
@@ -232,14 +234,16 @@ resources:
               - --catalog_name
               - ${var.catalog_name}
           libraries: []
-          environment_key: Default
+          environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
       queue:
         enabled: true
       environments:
-        - environment_key: Default
+        - environment_key: serverless_environment_demo
           spec:
             client: "4"
+            dependencies:
+              - "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
       performance_target: PERFORMANCE_OPTIMIZED
 
     # Notebook-based Jobs (DAB)
