@@ -4,8 +4,8 @@
     {
       "task_key": "bronze_ingest",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/bronze/bronze_ingest.py",
-        "source": "WORKSPACE",
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/bronze/bronze_ingest.py",
+        "source": "GIT",
         "parameters": [
           "--catalog_name",
           "maggiedatabricksterraform_dbw",
@@ -23,8 +23,8 @@
         }
       ],
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/bronze/bronze_archive.py",
-        "source": "WORKSPACE",
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/bronze/bronze_archive.py",
+        "source": "GIT",
         "parameters": [
           "--base_volume_path",
           "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
@@ -55,4 +55,3 @@
   "max_concurrent_runs": 1,
   "format": "MULTI_TASK"
 }
-

@@ -1,0 +1,105 @@
+{
+  "name": "daily_silver_load_incr_py_classic_api",
+  "tasks": [
+    {
+      "task_key": "load_claims_silver",
+      "spark_python_task": {
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_claims.py",
+        "source": "GIT",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "job_cluster_key": "classic_single_node"
+    },
+    {
+      "task_key": "load_patient_encounters_silver",
+      "spark_python_task": {
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_patient_encounters.py",
+        "source": "GIT",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "job_cluster_key": "classic_single_node"
+    },
+    {
+      "task_key": "load_medications_silver",
+      "spark_python_task": {
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_medications.py",
+        "source": "GIT",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "job_cluster_key": "classic_single_node"
+    },
+    {
+      "task_key": "load_procedures_silver",
+      "spark_python_task": {
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_procedures.py",
+        "source": "GIT",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "job_cluster_key": "classic_single_node"
+    },
+    {
+      "task_key": "load_member_monthly_snapshot_gold",
+      "depends_on": [
+        {
+          "task_key": "load_claims_silver"
+        },
+        {
+          "task_key": "load_patient_encounters_silver"
+        },
+        {
+          "task_key": "load_medications_silver"
+        },
+        {
+          "task_key": "load_procedures_silver"
+        }
+      ],
+      "spark_python_task": {
+        "python_file": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/scripts/gold/load_fact_member_monthly_snapshot.py",
+        "source": "GIT",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "job_cluster_key": "classic_single_node"
+    }
+  ],
+  "job_clusters": [
+    {
+      "job_cluster_key": "classic_single_node",
+      "new_cluster": {
+        "spark_version": "14.3.x-scala2.12",
+        "node_type_id": "Standard_DS3_v2",
+        "num_workers": 0,
+        "spark_conf": {
+          "spark.databricks.cluster.profile": "singleNode",
+          "spark.master": "local[*]"
+        },
+        "data_security_mode": "SINGLE_USER",
+        "runtime_engine": "STANDARD",
+        "custom_tags": {
+          "ResourceClass": "SingleNode"
+        }
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 30 2 * * ?",
+    "timezone_id": "America/Los_Angeles",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK"
+}

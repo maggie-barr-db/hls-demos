@@ -1,11 +1,38 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql.types import StringType
 import argparse
-from silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+import sys
+import os
+from tqdm import tqdm
+
+# Add src directory to path to import utils
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from utils.silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+
+# Import Faker from external libraries wheel
+from faker import Faker
 
 
 def load_fact_member_monthly_snapshot_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
     """Load fact_member_monthly_snapshot table incrementally."""
+    
+    # Initialize Faker for generating anonymized identifiers
+    fake = Faker()
+    Faker.seed(42)  # Set seed for reproducibility
+    
+    # Create UDF to generate anonymized patient identifiers using Faker from external libs wheel
+    def generate_anonymized_id(patient_id):
+        """Generate a consistent anonymized ID for privacy."""
+        if patient_id:
+            # Use hash to ensure same patient_id always gets same fake UUID
+            import hashlib
+            hash_val = int(hashlib.md5(str(patient_id).encode()).hexdigest(), 16)
+            fake.seed_instance(hash_val)
+            return fake.uuid4()
+        return None
+    
+    anonymize_id_udf = F.udf(generate_anonymized_id, StringType())
     
     run_ids_str = "', '".join(run_ids)
     
@@ -96,6 +123,13 @@ def load_fact_member_monthly_snapshot_incremental(spark: SparkSession, catalog_n
         LEFT JOIN condition_metrics cm ON pm.patient_id = cm.patient_id AND pm.year = cm.year AND pm.month = cm.month
     """)
     
+    # Add anonymized patient ID using Faker from external libraries wheel
+    # This demonstrates using an external library bundled in the wheel
+    df = df.withColumn(
+        "anonymized_patient_id",
+        anonymize_id_udf(F.col("patient_id"))
+    )
+    
     return df
 
 
@@ -119,22 +153,40 @@ def main():
     
     print(f"Processing {len(new_run_ids)} new run(s): {new_run_ids}")
     
-    df = load_fact_member_monthly_snapshot_incremental(spark, catalog_name, new_run_ids)
-    
-    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.synthea")
-    
-    # For monthly snapshot, we'll use append mode
-    # In production, you might want to use MERGE to handle updates
-    (df.write
-        .mode("append")
-        .format("delta")
-        .option("mergeSchema", "true")
-        .saveAsTable(f"{catalog_name}.synthea.{table_name}"))
-    
-    update_last_processed_run_id(spark, catalog_name, table_name, new_run_ids[-1])
+    # Using tqdm from custom libraries to show progress
+    print("Loading gold layer member monthly snapshot...")
+    with tqdm(total=4, desc="Processing", unit="step") as pbar:
+        pbar.set_description("Querying bronze tables")
+        df = load_fact_member_monthly_snapshot_incremental(spark, catalog_name, new_run_ids)
+        pbar.update(1)
+        
+        pbar.set_description("Creating schema")
+        spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.synthea")
+        pbar.update(1)
+        
+        pbar.set_description("Writing to Delta table")
+        # For monthly snapshot, we'll use append mode
+        # In production, you might want to use MERGE to handle updates
+        (df.write
+            .mode("append")
+            .format("delta")
+            .option("mergeSchema", "true")
+            .saveAsTable(f"{catalog_name}.synthea.{table_name}"))
+        pbar.update(1)
+        
+        pbar.set_description("Updating control table")
+        update_last_processed_run_id(spark, catalog_name, table_name, new_run_ids[-1])
+        pbar.update(1)
     
     record_count = df.count()
     print(f"✓ Loaded {record_count} records into {table_name}")
+    
+    # Demonstrate Faker from external libraries wheel
+    if record_count > 0:
+        sample_rows = df.select("patient_id", "anonymized_patient_id").limit(3).collect()
+        print(f"  Sample anonymized IDs (using Faker from hls_external_libs wheel):")
+        for row in sample_rows:
+            print(f"    Original: {row['patient_id']} → Anonymized: {row['anonymized_patient_id']}")
 
 
 if __name__ == "__main__":

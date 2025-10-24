@@ -24,3 +24,6 @@ tqdm>=4.66.0                # Progress bars for long-running operations
 scikit-learn>=1.3.0         # Machine learning
 statsmodels>=0.14.0         # Statistical models
 
+# Custom Packages
+/Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/hls_external_libs-0.1.0-py3-none-any.whl  # External libraries bundle (ydata-profiling, missingno, Faker)
+

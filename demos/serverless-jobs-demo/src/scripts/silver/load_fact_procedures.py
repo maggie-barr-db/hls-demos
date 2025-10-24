@@ -1,0 +1,103 @@
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+import argparse
+import sys
+import os
+
+# Add src directory to path to import utils
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from utils.silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+
+
+def load_fact_procedures_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
+    """Load fact_procedures table incrementally."""
+    
+    run_ids_str = "', '".join(run_ids)
+    
+    df = spark.sql(f"""
+        SELECT
+            md5(concat(pr.PATIENT, pr.ENCOUNTER, cast(pr.CODE as string), cast(pr.START as string))) as procedure_id,
+            pr.PATIENT as patient_id,
+            pr.ENCOUNTER as encounter_id,
+            pr.START as procedure_start_timestamp,
+            pr.STOP as procedure_stop_timestamp,
+            DATE(pr.START) as procedure_date_key,
+            (unix_timestamp(pr.STOP) - unix_timestamp(pr.START)) / 60 as procedure_duration_minutes,
+            pr.CODE as procedure_code,
+            pr.DESCRIPTION as procedure_description,
+            pr.SYSTEM as code_system,
+            pr.BASE_COST as procedure_cost,
+            pr.REASONCODE as reason_code,
+            pr.REASONDESCRIPTION as reason_description,
+            1 as procedure_count,
+            p.GENDER as patient_gender,
+            p.BIRTHDATE as patient_birthdate,
+            year(pr.START) - year(p.BIRTHDATE) as patient_age_at_procedure,
+            p.STATE as patient_state,
+            p.ZIP as patient_zip,
+            e.ENCOUNTERCLASS as encounter_class,
+            e.PROVIDER as provider_id,
+            e.ORGANIZATION as organization_id,
+            e.PAYER as payer_id,
+            prov.SPECIALITY as provider_specialty,
+            prov.NAME as provider_name,
+            org.NAME as organization_name,
+            org.CITY as organization_city,
+            org.STATE as organization_state,
+            pr.ingest_run_id,
+            pr.ingest_timestamp,
+            current_timestamp() as silver_load_timestamp
+        FROM {catalog_name}.synthea.procedures_bronze pr
+        LEFT JOIN {catalog_name}.synthea.patients_bronze p 
+            ON pr.PATIENT = p.Id
+        LEFT JOIN {catalog_name}.synthea.encounters_bronze e 
+            ON pr.ENCOUNTER = e.Id
+        LEFT JOIN {catalog_name}.synthea.providers_bronze prov 
+            ON e.PROVIDER = prov.Id
+        LEFT JOIN {catalog_name}.synthea.organizations_bronze org 
+            ON e.ORGANIZATION = org.Id
+        WHERE pr.ingest_run_id IN ('{run_ids_str}')
+    """)
+    
+    return df
+
+
+def main():
+    spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--catalog_name", type=str, required=True)
+    args, _ = parser.parse_known_args()
+    
+    catalog_name = args.catalog_name
+    table_name = "procedures_silver"
+    
+    last_run_id = get_last_processed_run_id(spark, catalog_name, table_name)
+    print(f"Last processed run ID: {last_run_id}")
+    
+    new_run_ids = get_new_run_ids(spark, catalog_name, "procedures_bronze", last_run_id)
+    
+    if not new_run_ids:
+        print("No new data to process.")
+        return
+    
+    print(f"Processing {len(new_run_ids)} new run(s): {new_run_ids}")
+    
+    df = load_fact_procedures_incremental(spark, catalog_name, new_run_ids)
+    
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.synthea")
+    
+    (df.write
+        .mode("append")
+        .format("delta")
+        .option("mergeSchema", "true")
+        .saveAsTable(f"{catalog_name}.synthea.{table_name}"))
+    
+    update_last_processed_run_id(spark, catalog_name, table_name, new_run_ids[-1])
+    
+    record_count = df.count()
+    print(f"✓ Loaded {record_count} records into {table_name}")
+
+
+if __name__ == "__main__":
+    main()
+

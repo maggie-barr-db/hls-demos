@@ -1,57 +1,59 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 import argparse
-from silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+import sys
+import os
+
+# Add src directory to path to import utils
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from utils.silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
 
 
-def load_fact_procedures_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
-    """Load fact_procedures table incrementally."""
+def load_fact_medications_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
+    """Load fact_medications table incrementally."""
     
     run_ids_str = "', '".join(run_ids)
     
     df = spark.sql(f"""
         SELECT
-            md5(concat(pr.PATIENT, pr.ENCOUNTER, cast(pr.CODE as string), cast(pr.START as string))) as procedure_id,
-            pr.PATIENT as patient_id,
-            pr.ENCOUNTER as encounter_id,
-            pr.START as procedure_start_timestamp,
-            pr.STOP as procedure_stop_timestamp,
-            DATE(pr.START) as procedure_date_key,
-            (unix_timestamp(pr.STOP) - unix_timestamp(pr.START)) / 60 as procedure_duration_minutes,
-            pr.CODE as procedure_code,
-            pr.DESCRIPTION as procedure_description,
-            pr.SYSTEM as code_system,
-            pr.BASE_COST as procedure_cost,
-            pr.REASONCODE as reason_code,
-            pr.REASONDESCRIPTION as reason_description,
-            1 as procedure_count,
+            md5(concat(m.PATIENT, m.ENCOUNTER, cast(m.CODE as string), cast(m.START as string))) as medication_id,
+            m.PATIENT as patient_id,
+            m.ENCOUNTER as encounter_id,
+            m.PAYER as payer_id,
+            m.START as prescription_start_date,
+            m.STOP as prescription_stop_date,
+            DATE(m.START) as prescription_date_key,
+            datediff(m.STOP, m.START) as days_supply,
+            m.CODE as medication_code,
+            m.DESCRIPTION as medication_description,
+            m.DISPENSES as dispenses,
+            m.BASE_COST as base_cost,
+            m.PAYER_COVERAGE as payer_coverage,
+            m.BASE_COST - m.PAYER_COVERAGE as patient_copay,
+            m.TOTALCOST as total_cost,
+            m.REASONCODE as reason_code,
+            m.REASONDESCRIPTION as reason_description,
             p.GENDER as patient_gender,
             p.BIRTHDATE as patient_birthdate,
-            year(pr.START) - year(p.BIRTHDATE) as patient_age_at_procedure,
+            year(m.START) - year(p.BIRTHDATE) as patient_age_at_prescription,
             p.STATE as patient_state,
             p.ZIP as patient_zip,
             e.ENCOUNTERCLASS as encounter_class,
             e.PROVIDER as provider_id,
             e.ORGANIZATION as organization_id,
-            e.PAYER as payer_id,
             prov.SPECIALITY as provider_specialty,
             prov.NAME as provider_name,
-            org.NAME as organization_name,
-            org.CITY as organization_city,
-            org.STATE as organization_state,
-            pr.ingest_run_id,
-            pr.ingest_timestamp,
+            m.ingest_run_id,
+            m.ingest_timestamp,
             current_timestamp() as silver_load_timestamp
-        FROM {catalog_name}.synthea.procedures_bronze pr
+        FROM {catalog_name}.synthea.medications_bronze m
         LEFT JOIN {catalog_name}.synthea.patients_bronze p 
-            ON pr.PATIENT = p.Id
+            ON m.PATIENT = p.Id
         LEFT JOIN {catalog_name}.synthea.encounters_bronze e 
-            ON pr.ENCOUNTER = e.Id
+            ON m.ENCOUNTER = e.Id
         LEFT JOIN {catalog_name}.synthea.providers_bronze prov 
             ON e.PROVIDER = prov.Id
-        LEFT JOIN {catalog_name}.synthea.organizations_bronze org 
-            ON e.ORGANIZATION = org.Id
-        WHERE pr.ingest_run_id IN ('{run_ids_str}')
+        WHERE m.ingest_run_id IN ('{run_ids_str}')
     """)
     
     return df
@@ -64,12 +66,12 @@ def main():
     args, _ = parser.parse_known_args()
     
     catalog_name = args.catalog_name
-    table_name = "procedures_silver"
+    table_name = "medications_silver"
     
     last_run_id = get_last_processed_run_id(spark, catalog_name, table_name)
     print(f"Last processed run ID: {last_run_id}")
     
-    new_run_ids = get_new_run_ids(spark, catalog_name, "procedures_bronze", last_run_id)
+    new_run_ids = get_new_run_ids(spark, catalog_name, "medications_bronze", last_run_id)
     
     if not new_run_ids:
         print("No new data to process.")
@@ -77,7 +79,7 @@ def main():
     
     print(f"Processing {len(new_run_ids)} new run(s): {new_run_ids}")
     
-    df = load_fact_procedures_incremental(spark, catalog_name, new_run_ids)
+    df = load_fact_medications_incremental(spark, catalog_name, new_run_ids)
     
     spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.synthea")
     

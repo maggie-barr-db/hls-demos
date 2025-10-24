@@ -10,6 +10,14 @@ variables:
     type: string
     description: "UC volume path to synthea landing root"
     default: ""
+  env:
+    type: string
+    description: "Environment: Production, Staging, Dev"
+    default: "Production"
+  repo_path:
+    type: string
+    description: "Git repo path in Databricks workspace"
+    default: "/Repos/${var.env}/hls-demos/demos/serverless-jobs-demo"
 
 targets:
   development:
@@ -43,7 +51,8 @@ resources:
         - task_key: bronze_ingest
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/bronze/bronze_ingest.py
+            python_file: ${var.repo_path}/src/scripts/bronze/bronze_ingest.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -57,7 +66,8 @@ resources:
             - task_key: bronze_ingest
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/bronze/bronze_archive.py
+            python_file: ${var.repo_path}/src/scripts/bronze/bronze_archive.py
+            source: GIT
             parameters:
               - --base_volume_path
               - ${var.base_volume_path}
@@ -87,7 +97,8 @@ resources:
         - task_key: load_claims_silver
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/silver/load_fact_claims.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_claims.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -97,7 +108,8 @@ resources:
         - task_key: load_patient_encounters_silver
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/silver/load_fact_patient_encounters.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_patient_encounters.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -107,7 +119,8 @@ resources:
         - task_key: load_medications_silver
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/silver/load_fact_medications.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_medications.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -117,7 +130,8 @@ resources:
         - task_key: load_procedures_silver
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/silver/load_fact_procedures.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_procedures.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -132,7 +146,8 @@ resources:
             - task_key: load_procedures_silver
           job_cluster_key: classic_single_node
           spark_python_task:
-            python_file: scripts/gold/load_fact_member_monthly_snapshot.py
+            python_file: ${var.repo_path}/src/scripts/gold/load_fact_member_monthly_snapshot.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -149,7 +164,8 @@ resources:
       tasks:
         - task_key: bronze_ingest
           spark_python_task:
-            python_file: scripts/bronze/bronze_ingest.py
+            python_file: ${var.repo_path}/src/scripts/bronze/bronze_ingest.py
+            source: GIT
             parameters:
               - --catalog_name
               - maggiedatabricksterraform_dbw
@@ -160,7 +176,8 @@ resources:
           depends_on:
             - task_key: bronze_ingest
           spark_python_task:
-            python_file: scripts/bronze/bronze_archive.py
+            python_file: ${var.repo_path}/src/scripts/bronze/bronze_archive.py
+            source: GIT
             parameters:
               - --base_volume_path
               - /Volumes/maggiedatabricksterraform_dbw/synthea/landing
@@ -184,7 +201,8 @@ resources:
       tasks:
         - task_key: load_claims_silver
           spark_python_task:
-            python_file: scripts/silver/load_fact_claims.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_claims.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -194,7 +212,8 @@ resources:
         
         - task_key: load_patient_encounters_silver
           spark_python_task:
-            python_file: scripts/silver/load_fact_patient_encounters.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_patient_encounters.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -204,7 +223,8 @@ resources:
         
         - task_key: load_medications_silver
           spark_python_task:
-            python_file: scripts/silver/load_fact_medications.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_medications.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -214,7 +234,8 @@ resources:
         
         - task_key: load_procedures_silver
           spark_python_task:
-            python_file: scripts/silver/load_fact_procedures.py
+            python_file: ${var.repo_path}/src/scripts/silver/load_fact_procedures.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -229,7 +250,8 @@ resources:
             - task_key: load_medications_silver
             - task_key: load_procedures_silver
           spark_python_task:
-            python_file: scripts/gold/load_fact_member_monthly_snapshot.py
+            python_file: ${var.repo_path}/src/scripts/gold/load_fact_member_monthly_snapshot.py
+            source: GIT
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -256,16 +278,28 @@ resources:
       tasks:
         - task_key: bronze_ingest
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/bronze/bronze_ingest
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/bronze/bronze_ingest
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+              base_volume_path: ${var.base_volume_path}
         - task_key: bronze_archive
           depends_on:
             - task_key: bronze_ingest
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/bronze/bronze_archive
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/bronze/bronze_archive
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+              base_volume_path: ${var.base_volume_path}
       queue:
         enabled: true
+      environments:
+        - environment_key: serverless_environment_demo
+          spec:
+            client: "4"
+            dependencies:
+              - "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
       performance_target: PERFORMANCE_OPTIMIZED
 
     daily_silver_load_incr_nb_serverless_dab:
@@ -277,20 +311,28 @@ resources:
       tasks:
         - task_key: load_claims_silver
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/silver/load_fact_claims
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_claims
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
         - task_key: load_medications_silver
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/silver/load_fact_medications
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_medications
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
         - task_key: load_patient_encounters_silver
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/silver/load_fact_patient_encounters
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_patient_encounters
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
         - task_key: load_procedures_silver
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/silver/load_fact_procedures
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_procedures
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
         - task_key: load_member_monthly_snapshot_gold
           depends_on:
             - task_key: load_claims_silver
@@ -298,8 +340,16 @@ resources:
             - task_key: load_patient_encounters_silver
             - task_key: load_procedures_silver
           notebook_task:
-            notebook_path: /Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/gold/load_fact_member_monthly_snapshot
-            source: WORKSPACE
+            notebook_path: ${var.repo_path}/src/notebooks/gold/load_fact_member_monthly_snapshot
+            source: GIT
+            base_parameters:
+              catalog_name: ${var.catalog_name}
       queue:
         enabled: true
+      environments:
+        - environment_key: serverless_environment_demo
+          spec:
+            client: "4"
+            dependencies:
+              - "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
       performance_target: PERFORMANCE_OPTIMIZED

@@ -1,6 +1,11 @@
 # Personal notes and questions
 open_questions.txt
 
+# Wheel package build artifacts
+demos/serverless-jobs-demo/hls_external_libs/build/
+demos/serverless-jobs-demo/hls_external_libs/dist/
+demos/serverless-jobs-demo/hls_external_libs/*.egg-info/
+
 # Python
 __pycache__/
 *.py[cod]

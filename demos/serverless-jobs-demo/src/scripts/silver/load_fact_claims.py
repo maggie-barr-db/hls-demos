@@ -1,7 +1,12 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 import argparse
-from silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+import sys
+import os
+
+# Add src directory to path to import utils
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from utils.silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
 
 
 def load_fact_claims_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
