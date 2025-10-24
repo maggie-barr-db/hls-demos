@@ -42,6 +42,68 @@ This demo creates **18 bronze tables** and **5 silver/gold tables** for healthca
 
 ---
 
+## Key Features
+
+This demo showcases modern Databricks best practices and capabilities:
+
+### 🔧 **Dual Code Format Support**
+- **Python Scripts** (`.py`) for production workloads
+- **Jupyter Notebooks** (`.ipynb`) for interactive development
+- Jobs configured to call both Python tasks AND notebook tasks
+- **Same business logic**, different execution contexts
+- Compare performance, debugging, and maintenance between formats
+
+### 🚀 **Serverless Environment Configuration**
+- Custom serverless environment (`serverless_environment_demo`) with 15+ additional libraries
+- Environment specified at the **job level** via `environment_key`
+- Dependencies managed centrally via **`requirements.txt` hosted on UC Volume**
+- All serverless jobs and notebooks reference: `/Volumes/{catalog}/synthea/admin_configs/requirements.txt`
+- No per-task dependency management needed
+
+### 📦 **Custom Wheel Packaging & Deployment**
+- **Meta-package wheel**: `hls_external_libs-0.1.0-py3-none-any.whl`
+- Bundles external PyPI libraries: `ydata-profiling`, `missingno`, `Faker`
+- Wheel deployed to UC Volume and referenced in `requirements.txt`
+- **Demonstrated in**: `load_fact_member_monthly_snapshot` (gold layer)
+  - Imports `Faker` library from the wheel
+  - Generates anonymized patient IDs with cryptographic hashing
+  - Shows seamless integration of bundled external libraries
+
+### 🏗️ **Medallion Architecture**
+- **Bronze**: Raw ingestion with metadata tracking (`ingest_run_id`, `ingest_timestamp`, `source_file`)
+- **Silver**: Cleaned fact tables with incremental loading
+- **Gold**: Aggregated business metrics (monthly member snapshots)
+
+### ⚡ **Incremental Data Processing**
+- **Bronze**: File-based incremental loading with automatic archiving
+- **Silver/Gold**: Run ID-based incremental processing using control tables
+- Only new data processed on each run
+- Idempotent and rerunnable pipelines
+
+### 🎯 **Multiple Compute Options**
+- **Classic Compute**: Single-node jobs for cost-sensitive workloads
+- **Serverless Compute**: Instant startup, auto-scaling for dynamic workloads
+- Same code works on both - just configuration changes
+
+### 🛠️ **Flexible Deployment Methods**
+- **Databricks Asset Bundles (DAB)**: GitOps-friendly YAML configuration
+- **Jobs API**: JSON-based programmatic deployment for CI/CD
+- **Workspace-based**: Code deployed to `/Workspace/Shared/` for easy access
+- Side-by-side comparison of deployment approaches
+
+### 📊 **Modular Code Structure**
+- Reusable utilities in `src/utils/` (`silver_control.py`)
+- Clear separation: scripts, notebooks, infrastructure
+- Consistent patterns across bronze, silver, and gold layers
+
+### 🔄 **Production-Ready Patterns**
+- Job dependencies and task orchestration
+- Control tables for state management
+- Schema evolution with merge operations
+- Error handling and data validation
+
+---
+
 ## Quick Start
 
 ```bash

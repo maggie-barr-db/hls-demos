@@ -4,8 +4,8 @@
     {
       "task_key": "load_claims_silver",
       "notebook_task": {
-        "notebook_path": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_claims",
-        "source": "GIT",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_claims",
+        "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "maggiedatabricksterraform_dbw"
         }
@@ -14,8 +14,8 @@
     {
       "task_key": "load_medications_silver",
       "notebook_task": {
-        "notebook_path": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_medications",
-        "source": "GIT",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_medications",
+        "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "maggiedatabricksterraform_dbw"
         }
@@ -24,8 +24,8 @@
     {
       "task_key": "load_patient_encounters_silver",
       "notebook_task": {
-        "notebook_path": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_patient_encounters",
-        "source": "GIT",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_patient_encounters",
+        "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "maggiedatabricksterraform_dbw"
         }
@@ -34,8 +34,8 @@
     {
       "task_key": "load_procedures_silver",
       "notebook_task": {
-        "notebook_path": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_procedures",
-        "source": "GIT",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_procedures",
+        "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "maggiedatabricksterraform_dbw"
         }
@@ -58,8 +58,8 @@
         }
       ],
       "notebook_task": {
-        "notebook_path": "/Repos/Production/hls-demos/demos/serverless-jobs-demo/src/notebooks/gold/load_fact_member_monthly_snapshot",
-        "source": "GIT",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/gold/load_fact_member_monthly_snapshot",
+        "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "maggiedatabricksterraform_dbw"
         }
@@ -69,17 +69,6 @@
   "queue": {
     "enabled": true
   },
-  "environments": [
-    {
-      "environment_key": "serverless_environment_demo",
-      "spec": {
-        "client": "4",
-        "dependencies": [
-          "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
-        ]
-      }
-    }
-  ],
   "schedule": {
     "quartz_cron_expression": "0 30 2 * * ?",
     "timezone_id": "UTC",

@@ -115,22 +115,16 @@ setup_git_repo() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    echo -e "${YELLOW}ℹ️  This deployment uses Git integration.${NC}"
+    echo -e "${YELLOW}ℹ️  This deployment uses Workspace files.${NC}"
     echo ""
-    echo "📋 Prerequisites:"
-    echo "   1. Push your code to Git repository"
-    echo "   2. Link repo to Databricks workspace (if not already done)"
+    echo "📋 Code Location:"
+    echo "   /Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
     echo ""
-    echo "To link repo (one-time setup):"
-    echo "   databricks repos create \\"
-    echo "     --url https://github.com/YOUR_ORG/hls-demos \\"
-    echo "     --provider gitHub \\"
-    echo "     --path /Repos/Production/hls-demos"
+    echo "💡 To sync code to workspace:"
+    echo "   databricks workspace import-dir src \\"
+    echo "     /Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src --overwrite"
     echo ""
-    echo "Or use Databricks UI:"
-    echo "   Workspace → Repos → Add Repo"
-    echo ""
-    echo -e "${GREEN}✓${NC} Jobs will reference code from: /Repos/Production/hls-demos"
+    echo -e "${GREEN}✓${NC} Jobs will reference code from: /Workspace/Shared/hls-demos"
     echo ""
 }
 
@@ -184,12 +178,12 @@ deploy_base_environments() {
 
 deploy_dab_jobs() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}  Step 2: Deploy DAB Jobs (Git-based)${NC}"
+    echo -e "${BLUE}  Step 2: Deploy DAB Jobs${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    echo -e "${YELLOW}ℹ️  Jobs will reference code from Git repository${NC}"
-    echo "   Repository path: /Repos/Production/hls-demos/demos/serverless-jobs-demo"
+    echo -e "${YELLOW}ℹ️  Jobs will reference code from Workspace${NC}"
+    echo "   Workspace path: /Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
     echo ""
     
     echo "Deploying Databricks Asset Bundle..."
@@ -197,7 +191,7 @@ deploy_dab_jobs() {
         --var catalog_name="${CATALOG_NAME}" \
         --var base_volume_path="${BASE_VOLUME_PATH}" \
         --var env="Production" \
-        --var repo_path="/Repos/Production/hls-demos/demos/serverless-jobs-demo"
+        --var repo_path="/Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
     
     echo ""
     echo -e "${GREEN}✓${NC} DAB jobs deployed successfully"
@@ -208,7 +202,7 @@ deploy_dab_jobs() {
     echo "  • daily_bronze_ingestion_incr_nb_serverless_dab"
     echo "  • daily_silver_load_incr_nb_serverless_dab"
     echo ""
-    echo -e "${YELLOW}📝 Note: Jobs read code from Git repo, not uploaded files${NC}"
+    echo -e "${YELLOW}📝 Note: Jobs read code from Workspace files${NC}"
     echo ""
 }
 
@@ -218,12 +212,12 @@ deploy_dab_jobs() {
 
 deploy_api_jobs() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}  Step 3: Deploy API Jobs (Git-based)${NC}"
+    echo -e "${BLUE}  Step 3: Deploy API Jobs${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    echo -e "${YELLOW}ℹ️  Jobs will reference code from Git repository${NC}"
-    echo "   Repository path: /Repos/Production/hls-demos/demos/serverless-jobs-demo"
+    echo -e "${YELLOW}ℹ️  Jobs will reference code from Workspace${NC}"
+    echo "   Workspace path: /Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
     echo ""
     
     cd infrastructure/api_jobs

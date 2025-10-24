@@ -16,8 +16,8 @@ variables:
     default: "Production"
   repo_path:
     type: string
-    description: "Git repo path in Databricks workspace"
-    default: "/Repos/${var.env}/hls-demos/demos/serverless-jobs-demo"
+    description: "Code path in Databricks workspace"
+    default: "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
 
 targets:
   development:
@@ -52,7 +52,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/bronze/bronze_ingest.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -67,7 +67,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/bronze/bronze_archive.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --base_volume_path
               - ${var.base_volume_path}
@@ -98,7 +98,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_claims.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -109,7 +109,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_patient_encounters.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -120,7 +120,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_medications.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -131,7 +131,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_procedures.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -147,7 +147,7 @@ resources:
           job_cluster_key: classic_single_node
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/gold/load_fact_member_monthly_snapshot.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -165,7 +165,7 @@ resources:
         - task_key: bronze_ingest
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/bronze/bronze_ingest.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - maggiedatabricksterraform_dbw
@@ -177,7 +177,7 @@ resources:
             - task_key: bronze_ingest
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/bronze/bronze_archive.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --base_volume_path
               - /Volumes/maggiedatabricksterraform_dbw/synthea/landing
@@ -202,7 +202,7 @@ resources:
         - task_key: load_claims_silver
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_claims.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -213,7 +213,7 @@ resources:
         - task_key: load_patient_encounters_silver
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_patient_encounters.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -224,7 +224,7 @@ resources:
         - task_key: load_medications_silver
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_medications.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -235,7 +235,7 @@ resources:
         - task_key: load_procedures_silver
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/silver/load_fact_procedures.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -251,7 +251,7 @@ resources:
             - task_key: load_procedures_silver
           spark_python_task:
             python_file: ${var.repo_path}/src/scripts/gold/load_fact_member_monthly_snapshot.py
-            source: GIT
+            source: WORKSPACE
             parameters:
               - --catalog_name
               - ${var.catalog_name}
@@ -279,7 +279,7 @@ resources:
         - task_key: bronze_ingest
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/bronze/bronze_ingest
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
               base_volume_path: ${var.base_volume_path}
@@ -288,7 +288,7 @@ resources:
             - task_key: bronze_ingest
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/bronze/bronze_archive
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
               base_volume_path: ${var.base_volume_path}
@@ -312,25 +312,25 @@ resources:
         - task_key: load_claims_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_claims
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
         - task_key: load_medications_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_medications
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
         - task_key: load_patient_encounters_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_patient_encounters
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
         - task_key: load_procedures_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_procedures
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
         - task_key: load_member_monthly_snapshot_gold
@@ -341,7 +341,7 @@ resources:
             - task_key: load_procedures_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/gold/load_fact_member_monthly_snapshot
-            source: GIT
+            source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
       queue:
