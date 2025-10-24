@@ -1,0 +1,35 @@
+{
+  "name": "daily_bronze_ingestion_incr_nb_serverless_api",
+  "tasks": [
+    {
+      "task_key": "bronze_ingest",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/bronze/bronze_ingest",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "bronze_archive",
+      "depends_on": [
+        {
+          "task_key": "bronze_ingest"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/notebooks/bronze/bronze_archive",
+        "source": "WORKSPACE"
+      }
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "schedule": {
+    "quartz_cron_expression": "0 0 2 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK"
+}
+

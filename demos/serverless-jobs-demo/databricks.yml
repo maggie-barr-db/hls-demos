@@ -139,9 +139,9 @@ resources:
           libraries: []
           run_if: ALL_SUCCESS
 
-    # Serverless Compute Jobs
-    daily_bronze_ingestion_incr_py_serverless:
-      name: daily_bronze_ingestion_incr_py_serverless
+    # Serverless Compute Jobs (DAB)
+    daily_bronze_ingestion_incr_py_serverless_dab:
+      name: daily_bronze_ingestion_incr_py_serverless_dab
       schedule:
         quartz_cron_expression: 0 0 2 * * ?
         timezone_id: UTC
@@ -173,8 +173,8 @@ resources:
             client: "4"
       performance_target: PERFORMANCE_OPTIMIZED
     
-    daily_silver_load_incr_py_serverless:
-      name: daily_silver_load_incr_py_serverless
+    daily_silver_load_incr_py_serverless_dab:
+      name: daily_silver_load_incr_py_serverless_dab
       schedule:
         quartz_cron_expression: "0 30 2 * * ?"
         timezone_id: "UTC"
@@ -242,9 +242,9 @@ resources:
             client: "4"
       performance_target: PERFORMANCE_OPTIMIZED
 
-    # Notebook-based Jobs
-    daily_bronze_ingestion_incr_nb_serverless:
-      name: daily_bronze_ingestion_incr_nb_serverless
+    # Notebook-based Jobs (DAB)
+    daily_bronze_ingestion_incr_nb_serverless_dab:
+      name: daily_bronze_ingestion_incr_nb_serverless_dab
       schedule:
         quartz_cron_expression: 0 0 2 * * ?
         timezone_id: UTC
@@ -264,8 +264,8 @@ resources:
         enabled: true
       performance_target: PERFORMANCE_OPTIMIZED
 
-    daily_silver_load_incr_nb_serverless:
-      name: daily_silver_load_incr_nb_serverless
+    daily_silver_load_incr_nb_serverless_dab:
+      name: daily_silver_load_incr_nb_serverless_dab
       schedule:
         quartz_cron_expression: 0 30 2 * * ?
         timezone_id: UTC

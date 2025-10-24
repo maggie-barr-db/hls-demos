@@ -1,0 +1,55 @@
+{
+  "name": "daily_bronze_ingestion_incr_py_serverless_api",
+  "tasks": [
+    {
+      "task_key": "bronze_ingest",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/bronze/bronze_ingest.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw",
+          "--base_volume_path",
+          "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
+        ]
+      },
+      "environment_key": "Default"
+    },
+    {
+      "task_key": "bronze_archive",
+      "depends_on": [
+        {
+          "task_key": "bronze_ingest"
+        }
+      ],
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/bronze/bronze_archive.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--base_volume_path",
+          "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
+        ]
+      },
+      "environment_key": "Default"
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "environments": [
+    {
+      "environment_key": "Default",
+      "spec": {
+        "client": "4"
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 0 2 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK"
+}
+

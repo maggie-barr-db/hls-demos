@@ -1,0 +1,103 @@
+{
+  "name": "daily_silver_load_incr_py_serverless_api",
+  "tasks": [
+    {
+      "task_key": "load_claims_silver",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/silver/load_fact_claims.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "libraries": [],
+      "environment_key": "Default"
+    },
+    {
+      "task_key": "load_patient_encounters_silver",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/silver/load_fact_patient_encounters.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "libraries": [],
+      "environment_key": "Default"
+    },
+    {
+      "task_key": "load_medications_silver",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/silver/load_fact_medications.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "libraries": [],
+      "environment_key": "Default"
+    },
+    {
+      "task_key": "load_procedures_silver",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/silver/load_fact_procedures.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "libraries": [],
+      "environment_key": "Default"
+    },
+    {
+      "task_key": "load_member_monthly_snapshot_gold",
+      "depends_on": [
+        {
+          "task_key": "load_claims_silver"
+        },
+        {
+          "task_key": "load_patient_encounters_silver"
+        },
+        {
+          "task_key": "load_medications_silver"
+        },
+        {
+          "task_key": "load_procedures_silver"
+        }
+      ],
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/serverless-jobs-demo/files/scripts/gold/load_fact_member_monthly_snapshot.py",
+        "source": "WORKSPACE",
+        "parameters": [
+          "--catalog_name",
+          "maggiedatabricksterraform_dbw"
+        ]
+      },
+      "libraries": [],
+      "environment_key": "Default"
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "environments": [
+    {
+      "environment_key": "Default",
+      "spec": {
+        "client": "4"
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 30 2 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK"
+}
+
