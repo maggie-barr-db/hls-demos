@@ -39,3 +39,6 @@ dependencies:
     # Note: You may need to upload this to a workspace path or volume
     # - /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/hls_external_libs-0.1.0-py3-none-any.whl
 
+env:
+  - name: keyvault
+    value: 'prod'

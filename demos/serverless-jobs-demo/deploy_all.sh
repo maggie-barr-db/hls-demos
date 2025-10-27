@@ -106,6 +106,44 @@ echo "  Volume: ${BASE_VOLUME_PATH}"
 echo ""
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Function: Deploy Usage Policy
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+deploy_usage_policy() {
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  Step 0: Usage Policy Setup${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    echo -e "${YELLOW}⚠️  Serverless usage policies must be created via the Databricks UI${NC}"
+    echo ""
+    echo "📋 To create the usage policy:"
+    echo "   1. Go to: Workspace settings → Compute → Serverless usage policies"
+    echo "   2. Click 'Create usage policy'"
+    echo "   3. Enter name: data_lake_hydration_policy"
+    echo "   4. Add tags:"
+    echo "      • Key: workload_type, Value: data_lake_hydration"
+    echo "      • Key: cost_center, Value: data_engineering"
+    echo "   5. Click 'Create'"
+    echo "   6. Copy the Policy ID and run:"
+    echo "      echo '<policy_id>' > infrastructure/.usage_policy_id"
+    echo ""
+    
+    # Check if policy ID already exists
+    if [ -f "infrastructure/.usage_policy_id" ]; then
+        POLICY_ID=$(cat infrastructure/.usage_policy_id)
+        echo -e "${GREEN}✓${NC} Usage policy ID found: ${POLICY_ID}"
+        echo -e "${GREEN}✓${NC} Jobs will be attached to this policy"
+    else
+        echo -e "${YELLOW}ℹ️  No policy ID found. Jobs will deploy without usage policy.${NC}"
+        echo -e "${YELLOW}   Create the policy in UI and redeploy to attach it.${NC}"
+        # Create empty file so deployments don't fail
+        echo "" > infrastructure/.usage_policy_id
+    fi
+    echo ""
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Function: Setup Git Repository (one-time)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -186,12 +224,25 @@ deploy_dab_jobs() {
     echo "   Workspace path: /Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
     echo ""
     
+    # Read usage policy ID if it exists
+    USAGE_POLICY_ID=""
+    if [ -f "infrastructure/.usage_policy_id" ] && [ -s "infrastructure/.usage_policy_id" ]; then
+        USAGE_POLICY_ID=$(cat infrastructure/.usage_policy_id | tr -d '[:space:]')
+        if [ -n "$USAGE_POLICY_ID" ]; then
+            echo "Using usage policy ID: ${USAGE_POLICY_ID}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  No usage policy ID found. Jobs will deploy without usage policy.${NC}"
+    fi
+    echo ""
+    
     echo "Deploying Databricks Asset Bundle..."
     databricks bundle deploy --target development \
         --var catalog_name="${CATALOG_NAME}" \
         --var base_volume_path="${BASE_VOLUME_PATH}" \
         --var env="Production" \
-        --var repo_path="/Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
+        --var repo_path="/Workspace/Shared/hls-demos/demos/serverless-jobs-demo" \
+        --var budget_policy_id="${USAGE_POLICY_ID}"
     
     echo ""
     echo -e "${GREEN}✓${NC} DAB jobs deployed successfully"
@@ -220,12 +271,34 @@ deploy_api_jobs() {
     echo "   Workspace path: /Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
     echo ""
     
+    # Read usage policy ID
+    USAGE_POLICY_ID=""
+    if [ -f "infrastructure/.usage_policy_id" ] && [ -s "infrastructure/.usage_policy_id" ]; then
+        USAGE_POLICY_ID=$(cat infrastructure/.usage_policy_id | tr -d '[:space:]')
+        if [ -n "$USAGE_POLICY_ID" ]; then
+            echo "Using usage policy ID: ${USAGE_POLICY_ID}"
+        fi
+    fi
+    
+    if [ -z "$USAGE_POLICY_ID" ]; then
+        echo -e "${YELLOW}⚠️  No usage policy ID found. Jobs will deploy without usage policy.${NC}"
+    fi
+    echo ""
+    
     cd infrastructure/api_jobs
     
     for json_file in *.json; do
         if [ -f "$json_file" ]; then
             job_name=$(jq -r '.name' "$json_file")
             echo "Deploying: ${job_name}"
+            
+            # If no policy ID, remove the budget_policy_id field from JSON
+            if [ -z "$USAGE_POLICY_ID" ]; then
+                job_json=$(cat "$json_file" | jq 'del(.budget_policy_id)')
+            else
+                # Replace {{USAGE_POLICY_ID}} placeholder with actual policy ID
+                job_json=$(cat "$json_file" | sed "s/{{USAGE_POLICY_ID}}/$USAGE_POLICY_ID/g")
+            fi
             
             # Check if job already exists
             existing_job_id=$(databricks jobs list --output json 2>/dev/null | \
@@ -235,7 +308,7 @@ deploy_api_jobs() {
                 echo "  → Deleting existing job (ID: $existing_job_id)"
                 databricks jobs delete $existing_job_id 2>&1 > /dev/null
                 echo "  → Creating new job"
-                result=$(databricks jobs create --json @"$json_file" 2>&1)
+                result=$(echo "$job_json" | databricks jobs create --json @/dev/stdin 2>&1)
                 if [ $? -eq 0 ]; then
                     new_job_id=$(echo "$result" | jq -r '.job_id')
                     echo -e "  ${GREEN}✓${NC} Created successfully (ID: $new_job_id)"
@@ -244,7 +317,7 @@ deploy_api_jobs() {
                 fi
             else
                 echo "  → Creating new job"
-                result=$(databricks jobs create --json @"$json_file" 2>&1)
+                result=$(echo "$job_json" | databricks jobs create --json @/dev/stdin 2>&1)
                 if [ $? -eq 0 ]; then
                     new_job_id=$(echo "$result" | jq -r '.job_id')
                     echo -e "  ${GREEN}✓${NC} Created successfully (ID: $new_job_id)"
@@ -271,6 +344,7 @@ setup_git_repo
 
 case "$DEPLOY_MODE" in
     all)
+        deploy_usage_policy
         deploy_base_environments
         deploy_dab_jobs
         deploy_api_jobs

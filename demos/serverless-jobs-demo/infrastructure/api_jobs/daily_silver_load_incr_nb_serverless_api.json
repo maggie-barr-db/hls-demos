@@ -74,6 +74,7 @@
     "timezone_id": "UTC",
     "pause_status": "PAUSED"
   },
+  "budget_policy_id": "{{USAGE_POLICY_ID}}",
   "max_concurrent_runs": 1,
   "format": "MULTI_TASK",
   "performance_target": "PERFORMANCE_OPTIMIZED"

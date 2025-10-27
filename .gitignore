@@ -34,6 +34,7 @@ Thumbs.db
 # Databricks
 .databricks/
 *.json.bak
+demos/serverless-jobs-demo/infrastructure/.usage_policy_id
 
 # Logs
 *.log

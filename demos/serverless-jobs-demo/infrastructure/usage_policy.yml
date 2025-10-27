@@ -1,0 +1,20 @@
+# Serverless Usage Policy for Data Lake Hydration
+# This policy tracks costs for bronze/silver/gold pipeline jobs
+
+name: data_lake_hydration_policy
+description: "Budget and usage tracking policy for data lake hydration pipelines (bronze, silver, gold layers)"
+
+# Tags for cost tracking and attribution
+tags:
+  - key: workload_type
+    value: data_lake_hydration
+  - key: cost_center
+    value: data_engineering
+
+# Policy applies to this workspace
+workspace_id: "{{ WORKSPACE_ID }}"
+
+# Usage limits (optional - uncomment to enable)
+# max_dbu_per_hour: 100
+# max_total_dbu: 1000
+

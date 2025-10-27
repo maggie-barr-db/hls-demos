@@ -18,6 +18,10 @@ variables:
     type: string
     description: "Code path in Databricks workspace"
     default: "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
+  budget_policy_id:
+    type: string
+    description: "Serverless budget/usage policy ID for cost tracking"
+    default: ""
 
 targets:
   development:
@@ -157,6 +161,7 @@ resources:
     # Serverless Compute Jobs (DAB)
     daily_bronze_ingestion_incr_py_serverless_dab:
       name: daily_bronze_ingestion_incr_py_serverless_dab
+      budget_policy_id: ${var.budget_policy_id}
       schedule:
         quartz_cron_expression: 0 0 2 * * ?
         timezone_id: UTC
@@ -194,6 +199,7 @@ resources:
     
     daily_silver_load_incr_py_serverless_dab:
       name: daily_silver_load_incr_py_serverless_dab
+      budget_policy_id: ${var.budget_policy_id}
       schedule:
         quartz_cron_expression: "0 30 2 * * ?"
         timezone_id: "UTC"
@@ -271,6 +277,7 @@ resources:
     # Notebook-based Jobs (DAB)
     daily_bronze_ingestion_incr_nb_serverless_dab:
       name: daily_bronze_ingestion_incr_nb_serverless_dab
+      budget_policy_id: ${var.budget_policy_id}
       schedule:
         quartz_cron_expression: 0 0 2 * * ?
         timezone_id: UTC
@@ -304,6 +311,7 @@ resources:
 
     daily_silver_load_incr_nb_serverless_dab:
       name: daily_silver_load_incr_nb_serverless_dab
+      budget_policy_id: ${var.budget_policy_id}
       schedule:
         quartz_cron_expression: 0 30 2 * * ?
         timezone_id: UTC
