@@ -5,8 +5,16 @@ import sys
 import os
 
 # Add src directory to path to import utils
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from utils.silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+# Use sys.argv[0] which is available both locally and in Databricks
+script_path = sys.argv[0] if sys.argv and sys.argv[0] else __file__
+script_dir = os.path.dirname(os.path.abspath(script_path))
+# Navigate up from scripts/silver/ to src/
+src_dir = os.path.dirname(os.path.dirname(script_dir))
+
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
+
+from utils import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids, get_all_run_ids
 
 
 def load_fact_procedures_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
@@ -66,36 +74,45 @@ def main():
     spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
     parser = argparse.ArgumentParser()
     parser.add_argument("--catalog_name", type=str, required=True)
+    parser.add_argument("--load_type", type=str, default="full", choices=["full", "incremental"])
     args, _ = parser.parse_known_args()
     
     catalog_name = args.catalog_name
+    load_type = args.load_type
     table_name = "procedures_silver"
     
-    last_run_id = get_last_processed_run_id(spark, catalog_name, table_name)
-    print(f"Last processed run ID: {last_run_id}")
+    # Get run IDs to process based on load type
+    if load_type == "full":
+        print("Running FULL load - processing all data")
+        run_ids = get_all_run_ids(spark, catalog_name, "procedures_bronze")
+    else:
+        # Incremental load
+        last_run_id = get_last_processed_run_id(spark, catalog_name, table_name)
+        print(f"Running INCREMENTAL load - Last processed run ID: {last_run_id}")
+        run_ids = get_new_run_ids(spark, catalog_name, "procedures_bronze", last_run_id)
     
-    new_run_ids = get_new_run_ids(spark, catalog_name, "procedures_bronze", last_run_id)
-    
-    if not new_run_ids:
-        print("No new data to process.")
+    if not run_ids:
+        print("No data to process.")
         return
     
-    print(f"Processing {len(new_run_ids)} new run(s): {new_run_ids}")
+    print(f"Processing {len(run_ids)} run(s): {run_ids}")
     
-    df = load_fact_procedures_incremental(spark, catalog_name, new_run_ids)
+    df = load_fact_procedures_incremental(spark, catalog_name, run_ids)
     
     spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.synthea")
     
+    # Write to silver table - use overwrite for full loads, append for incremental
+    write_mode = "overwrite" if load_type == "full" else "append"
     (df.write
-        .mode("append")
+        .mode(write_mode)
         .format("delta")
         .option("mergeSchema", "true")
         .saveAsTable(f"{catalog_name}.synthea.{table_name}"))
     
-    update_last_processed_run_id(spark, catalog_name, table_name, new_run_ids[-1])
+    update_last_processed_run_id(spark, catalog_name, table_name, run_ids[-1])
     
     record_count = df.count()
-    print(f"✓ Loaded {record_count} records into {table_name}")
+    print(f"✓ Loaded {record_count} records into {table_name} (mode: {load_type})")
 
 
 if __name__ == "__main__":

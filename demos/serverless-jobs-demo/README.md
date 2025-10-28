@@ -61,24 +61,35 @@ This demo showcases modern Databricks best practices and capabilities:
 - No per-task dependency management needed
 
 ### 📦 **Custom Wheel Packaging & Deployment**
-- **Meta-package wheel**: `hls_external_libs-0.1.0-py3-none-any.whl`
-- Bundles external PyPI libraries: `ydata-profiling`, `missingno`, `Faker`
-- Wheel deployed to UC Volume and referenced in `requirements.txt`
+- **Two custom wheels** demonstrate different library deployment patterns:
+  1. **`hls_external_libs`** (`infrastructure/external_libs/hls_external_libs/`)
+     - Meta-package bundling: `ydata-profiling`, `missingno`, `Faker`
+     - Used in serverless environments via `requirements.txt`
+  2. **`faker_wheel`** (`infrastructure/external_libs/faker_wheel/`)
+     - Standalone Faker library package
+     - Installed on classic compute via init script
+- Wheels deployed to UC Volume and managed centrally
 - **Demonstrated in**: `load_fact_member_monthly_snapshot` (gold layer)
   - Imports `Faker` library from the wheel
   - Generates anonymized patient IDs with cryptographic hashing
   - Shows seamless integration of bundled external libraries
+- **Demonstrated in**: `functional_testing` notebook (data quality job)
+  - Uses both `Faker` (from wheel) and `html2text` (from requirements.txt)
+  - Shows different library installation methods working together
 
 ### 🏗️ **Medallion Architecture**
 - **Bronze**: Raw ingestion with metadata tracking (`ingest_run_id`, `ingest_timestamp`, `source_file`)
 - **Silver**: Cleaned fact tables with incremental loading
 - **Gold**: Aggregated business metrics (monthly member snapshots)
 
-### ⚡ **Incremental Data Processing**
-- **Bronze**: File-based incremental loading with automatic archiving
-- **Silver/Gold**: Run ID-based incremental processing using control tables
-- Only new data processed on each run
-- Idempotent and rerunnable pipelines
+### ⚡ **Full Load Configuration for Performance Comparison**
+- **Silver jobs are configured to run FULL loads** (processing all data each time)
+- This enables side-by-side comparison of classic vs serverless compute with identical data volumes
+- Allows for accurate cost and performance analysis between compute options
+- Each silver script/notebook supports both `full` and `incremental` load modes via `--load_type` parameter
+- **Bronze layer** still uses incremental loading with automatic archiving
+
+**Note**: The silver layer infrastructure supports incremental processing capabilities (run ID-based tracking with control tables). To switch to incremental mode, change `load_type` parameter from `"full"` to `"incremental"` in job configurations.
 
 ### 🎯 **Multiple Compute Options**
 - **Classic Compute**: Single-node jobs for cost-sensitive workloads
@@ -310,6 +321,19 @@ ORDER BY year, month;
 ---
 
 ## Classic vs Serverless Compute
+
+### Full Load Configuration for Fair Comparison
+
+**All silver jobs are configured to run FULL loads** to enable accurate side-by-side performance and cost comparisons:
+- Same data volumes processed across classic and serverless jobs
+- Identical SQL transformations and business logic
+- Run jobs simultaneously or sequentially to compare:
+  - Total execution time
+  - DBU consumption
+  - Cost per run
+  - Resource utilization patterns
+
+This configuration allows you to make data-driven decisions about which compute option best fits your workload characteristics.
 
 ### Quick Decision Guide
 

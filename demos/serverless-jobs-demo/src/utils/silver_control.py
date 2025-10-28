@@ -62,3 +62,14 @@ def get_new_run_ids(spark: SparkSession, catalog_name: str, bronze_table: str, l
     
     return [row.ingest_run_id for row in df.collect()]
 
+
+def get_all_run_ids(spark: SparkSession, catalog_name: str, bronze_table: str) -> list[str]:
+    """Get all run IDs from a bronze table (for full loads)."""
+    df = spark.sql(f"""
+        SELECT DISTINCT ingest_run_id
+        FROM {catalog_name}.synthea.{bronze_table}
+        ORDER BY ingest_run_id
+    """)
+    
+    return [row.ingest_run_id for row in df.collect()]
+

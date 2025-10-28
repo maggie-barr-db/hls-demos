@@ -1,0 +1,83 @@
+{
+  "name": "data_quality_profiling_classic_api",
+  "tasks": [
+    {
+      "task_key": "functional_testing",
+      "job_cluster_key": "classic_single_node",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/functional_testing",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "maggiedatabricksterraform_dbw"
+        }
+      }
+    },
+    {
+      "task_key": "data_quality_profiling",
+      "depends_on": [
+        {
+          "task_key": "functional_testing"
+        }
+      ],
+      "job_cluster_key": "classic_single_node",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/data_quality_profiling",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "maggiedatabricksterraform_dbw"
+        }
+      }
+    }
+  ],
+  "job_clusters": [
+    {
+      "job_cluster_key": "classic_single_node",
+      "new_cluster": {
+        "spark_version": "14.3.x-scala2.12",
+        "node_type_id": "Standard_DS3_v2",
+        "num_workers": 0,
+        "spark_conf": {
+          "spark.databricks.cluster.profile": "singleNode",
+          "spark.master": "local[*]",
+          "spark.databricks.delta.preview.enabled": "true",
+          "spark.databricks.sql.initial.catalog.name": "prod_catalog",
+          "spark.sql.parquet.int96RebaseModeInRead": "LEGACY",
+          "spark.sql.parquet.int96RebaseModeInWrite": "LEGACY",
+          "spark.sql.parquet.datetimeRebaseModeInRead": "LEGACY",
+          "spark.sql.parquet.datetimeRebaseModeInWrite": "LEGACY",
+          "spark.sql.legacy.timeParserPolicy": "LEGACY",
+          "spark.sql.storeAssignmentPolicy": "LEGACY",
+          "spark.network.timeout": "800",
+          "spark.databricks.dataLineage.enabled": "true",
+          "spark.databricks.safespark.externalUDF.plan.limit": "25",
+          "spark.driver.extraJavaOptions": "-Xss32M",
+          "spark.memory.offHeap.enabled": "false"
+        },
+        "spark_env_vars": {
+          "DATABASE_NAME": "synthea",
+          "LOCATION": "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
+        },
+        "init_scripts": [
+          {
+            "volumes": {
+              "destination": "/Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/install_faker_wheel.sh"
+            }
+          }
+        ],
+        "data_security_mode": "SINGLE_USER",
+        "runtime_engine": "STANDARD",
+        "custom_tags": {
+          "ResourceClass": "SingleNode"
+        }
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 0 3 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK"
+}
+

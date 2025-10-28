@@ -4,14 +4,64 @@ from pyspark.sql.types import StringType
 import argparse
 import sys
 import os
-from tqdm import tqdm
+
+# =============================================================================
+# DEMONSTRATION: Custom Library Imports
+# =============================================================================
+# This script demonstrates importing custom libraries from two sources:
+# 1. requirements.txt (tqdm) - via UC Volume in serverless environments
+# 2. Custom wheel (Faker) - packaged library deployed to UC Volume
+#
+# On classic compute without these libraries, graceful fallbacks are provided
+
+# Import tqdm from requirements.txt (for progress bars)
+try:
+    from tqdm import tqdm
+    HAS_TQDM = True
+    print("✓ Using tqdm from requirements.txt for progress tracking")
+except ImportError:
+    HAS_TQDM = False
+    print("ℹ️  tqdm not available - using simple progress output")
+    # Simple fallback context manager when tqdm is not available
+    class tqdm:
+        def __init__(self, *args, **kwargs):
+            pass
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def set_description(self, desc):
+            print(f"  {desc}...")
+        def update(self, n):
+            pass
 
 # Add src directory to path to import utils
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from utils.silver_control import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids
+# Use sys.argv[0] which is available both locally and in Databricks
+script_path = sys.argv[0] if sys.argv and sys.argv[0] else __file__
+script_dir = os.path.dirname(os.path.abspath(script_path))
+# Navigate up from scripts/gold/ to src/
+src_dir = os.path.dirname(os.path.dirname(script_dir))
 
-# Import Faker from external libraries wheel
-from faker import Faker
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
+
+from utils import get_last_processed_run_id, update_last_processed_run_id, get_new_run_ids, get_all_run_ids
+
+# Import Faker from hls_external_libs wheel (for anonymized ID generation)
+try:
+    from faker import Faker
+    HAS_FAKER = True
+    print("✓ Using Faker from hls_external_libs wheel for data anonymization")
+except ImportError:
+    HAS_FAKER = False
+    print("ℹ️  Faker not available - using simple hash-based anonymization")
+    # Simple fallback for anonymization when Faker is not available
+    import hashlib
+    class Faker:
+        @staticmethod
+        def uuid4():
+            # Generate a simple hash-based ID as fallback
+            return hashlib.md5(str(id(object())).encode()).hexdigest()[:8]
 
 
 def load_fact_member_monthly_snapshot_incremental(spark: SparkSession, catalog_name: str, run_ids: list[str]):
@@ -153,8 +203,21 @@ def main():
     
     print(f"Processing {len(new_run_ids)} new run(s): {new_run_ids}")
     
-    # Using tqdm from custom libraries to show progress
-    print("Loading gold layer member monthly snapshot...")
+    # =============================================================================
+    # DEMONSTRATION: Custom Library Usage in Action
+    # =============================================================================
+    # This section demonstrates:
+    # - tqdm (from requirements.txt) for progress tracking
+    # - Faker (from hls_external_libs wheel) for data anonymization
+    
+    print("\n" + "="*70)
+    print("GOLD LAYER: Member Monthly Snapshot")
+    print("="*70)
+    print(f"Custom Libraries Status:")
+    print(f"  - tqdm (requirements.txt):  {'✓ Available' if HAS_TQDM else '✗ Using fallback'}")
+    print(f"  - Faker (wheel package):     {'✓ Available' if HAS_FAKER else '✗ Using fallback'}")
+    print("="*70 + "\n")
+    
     with tqdm(total=4, desc="Processing", unit="step") as pbar:
         pbar.set_description("Querying bronze tables")
         df = load_fact_member_monthly_snapshot_incremental(spark, catalog_name, new_run_ids)

@@ -106,6 +106,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           run_if: ALL_SUCCESS
         
@@ -117,6 +119,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           run_if: ALL_SUCCESS
         
@@ -128,6 +132,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           run_if: ALL_SUCCESS
         
@@ -139,6 +145,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           run_if: ALL_SUCCESS
         
@@ -212,6 +220,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
@@ -223,6 +233,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
@@ -234,6 +246,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
@@ -245,6 +259,8 @@ resources:
             parameters:
               - --catalog_name
               - ${var.catalog_name}
+              - --load_type
+              - full
           libraries: []
           environment_key: serverless_environment_demo
           run_if: ALL_SUCCESS
@@ -323,24 +339,28 @@ resources:
             source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
+              load_type: full
         - task_key: load_medications_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_medications
             source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
+              load_type: full
         - task_key: load_patient_encounters_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_patient_encounters
             source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
+              load_type: full
         - task_key: load_procedures_silver
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/silver/load_fact_procedures
             source: WORKSPACE
             base_parameters:
               catalog_name: ${var.catalog_name}
+              load_type: full
         - task_key: load_member_monthly_snapshot_gold
           depends_on:
             - task_key: load_claims_silver
@@ -361,3 +381,63 @@ resources:
             dependencies:
               - "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
       performance_target: PERFORMANCE_OPTIMIZED
+
+    # Data Quality Job (Classic Compute with Notebooks)
+    data_quality_profiling_classic:
+      name: data_quality_profiling_classic
+      schedule:
+        quartz_cron_expression: "0 0 3 * * ?"
+        timezone_id: "UTC"
+        pause_status: "PAUSED"
+      job_clusters:
+        - job_cluster_key: classic_single_node
+          new_cluster:
+            spark_version: "14.3.x-scala2.12"
+            node_type_id: "Standard_DS3_v2"
+            spark_conf:
+              spark.databricks.cluster.profile: "singleNode"
+              spark.master: "local[*]"
+              spark.databricks.delta.preview.enabled: "true"
+              spark.databricks.sql.initial.catalog.name: "prod_catalog"
+              spark.sql.parquet.int96RebaseModeInRead: "LEGACY"
+              spark.sql.parquet.int96RebaseModeInWrite: "LEGACY"
+              spark.sql.parquet.datetimeRebaseModeInRead: "LEGACY"
+              spark.sql.parquet.datetimeRebaseModeInWrite: "LEGACY"
+              spark.sql.legacy.timeParserPolicy: "LEGACY"
+              spark.sql.storeAssignmentPolicy: "LEGACY"
+              spark.network.timeout: "800"
+              spark.databricks.dataLineage.enabled: "true"
+              spark.databricks.safespark.externalUDF.plan.limit: "25"
+              spark.driver.extraJavaOptions: "-Xss32M"
+              spark.memory.offHeap.enabled: "false"
+            spark_env_vars:
+              DATABASE_NAME: "synthea"
+              LOCATION: ${var.base_volume_path}
+            init_scripts:
+              - volumes:
+                  destination: /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/install_faker_wheel.sh
+            num_workers: 0
+            data_security_mode: "SINGLE_USER"
+            runtime_engine: "STANDARD"
+            custom_tags:
+              ResourceClass: "SingleNode"
+      tasks:
+        - task_key: functional_testing
+          job_cluster_key: classic_single_node
+          notebook_task:
+            notebook_path: ${var.repo_path}/src/notebooks/data_quality/functional_testing
+            source: WORKSPACE
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          run_if: ALL_SUCCESS
+        
+        - task_key: data_quality_profiling
+          depends_on:
+            - task_key: functional_testing
+          job_cluster_key: classic_single_node
+          notebook_task:
+            notebook_path: ${var.repo_path}/src/notebooks/data_quality/data_quality_profiling
+            source: WORKSPACE
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          run_if: ALL_SUCCESS

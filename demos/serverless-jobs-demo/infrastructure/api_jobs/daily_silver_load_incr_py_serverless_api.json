@@ -8,7 +8,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "libraries": [],
@@ -21,7 +23,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "libraries": [],
@@ -34,7 +38,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "libraries": [],
@@ -47,7 +53,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "libraries": [],

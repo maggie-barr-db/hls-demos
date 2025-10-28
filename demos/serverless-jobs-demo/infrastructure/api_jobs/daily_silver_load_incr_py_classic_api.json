@@ -8,7 +8,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "job_cluster_key": "classic_single_node"
@@ -20,7 +22,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "job_cluster_key": "classic_single_node"
@@ -32,7 +36,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "job_cluster_key": "classic_single_node"
@@ -44,7 +50,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw"
+          "maggiedatabricksterraform_dbw",
+          "--load_type",
+          "full"
         ]
       },
       "job_cluster_key": "classic_single_node"
