@@ -1,0 +1,40 @@
+{
+  "name": "data_quality_profiling_serverless_api",
+  "tasks": [
+    {
+      "task_key": "functional_testing",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/serverless/functional_testing",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "maggiedatabricksterraform_dbw",
+          "database_name": "prod",
+          "location": "/Volumes/maggiedatabricksterraform_dbw/synthea/functional_testing"
+        }
+      }
+    },
+    {
+      "task_key": "data_quality_profiling",
+      "depends_on": [
+        {
+          "task_key": "functional_testing"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/serverless/data_quality_profiling",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "maggiedatabricksterraform_dbw"
+        }
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 0 3 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK"
+}
+

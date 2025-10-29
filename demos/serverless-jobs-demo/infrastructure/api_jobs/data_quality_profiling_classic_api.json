@@ -5,7 +5,7 @@
       "task_key": "functional_testing",
       "existing_cluster_id": "1028-205942-k8jzdzc8",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/functional_testing",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/classic/functional_testing",
         "source": "WORKSPACE"
       }
     },
@@ -18,7 +18,7 @@
       ],
       "existing_cluster_id": "1028-205942-k8jzdzc8",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/data_quality_profiling",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/data_quality/classic/data_quality_profiling",
         "source": "WORKSPACE",
         "base_parameters": {}
       }

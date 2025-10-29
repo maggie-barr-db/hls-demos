@@ -1,0 +1,9 @@
+# =============================================================================
+# Requirements for Data Quality Serverless Environment
+# =============================================================================
+# This file specifies dependencies for the data quality profiling serverless job
+# Deployed to: /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/
+
+# Custom wheel with html2text library
+/Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/html2text_lib-0.1.0-py3-none-any.whl
+
