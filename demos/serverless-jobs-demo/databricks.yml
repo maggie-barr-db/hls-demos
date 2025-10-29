@@ -41,7 +41,7 @@ resources:
       job_clusters:
         - job_cluster_key: classic_single_node
           new_cluster:
-            spark_version: "14.3.x-scala2.12"
+            spark_version: "13.3.x-scala2.12"
             node_type_id: "Standard_DS3_v2"
             spark_conf:
               spark.databricks.cluster.profile: "singleNode"
@@ -87,7 +87,7 @@ resources:
       job_clusters:
         - job_cluster_key: classic_single_node
           new_cluster:
-            spark_version: "14.3.x-scala2.12"
+            spark_version: "13.3.x-scala2.12"
             node_type_id: "Standard_DS3_v2"
             spark_conf:
               spark.databricks.cluster.profile: "singleNode"
@@ -392,13 +392,12 @@ resources:
       job_clusters:
         - job_cluster_key: classic_single_node
           new_cluster:
-            spark_version: "14.3.x-scala2.12"
+            spark_version: "13.3.x-scala2.12"
             node_type_id: "Standard_DS3_v2"
             spark_conf:
               spark.databricks.cluster.profile: "singleNode"
-              spark.master: "local[*]"
               spark.databricks.delta.preview.enabled: "true"
-              spark.databricks.sql.initial.catalog.name: "prod_catalog"
+              spark.databricks.sql.initial.catalog.name: "maggiedatabricksterraform_dbw"
               spark.sql.parquet.int96RebaseModeInRead: "LEGACY"
               spark.sql.parquet.int96RebaseModeInWrite: "LEGACY"
               spark.sql.parquet.datetimeRebaseModeInRead: "LEGACY"
@@ -411,11 +410,11 @@ resources:
               spark.driver.extraJavaOptions: "-Xss32M"
               spark.memory.offHeap.enabled: "false"
             spark_env_vars:
-              DATABASE_NAME: "synthea"
-              LOCATION: ${var.base_volume_path}
+              DATABASE_NAME: "prod"
+              LOCATION: /Volumes/maggiedatabricksterraform_dbw/synthea/functional_testing
             init_scripts:
               - volumes:
-                  destination: /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/install_faker_wheel.sh
+                  destination: /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/install_html2text.sh
             num_workers: 0
             data_security_mode: "SINGLE_USER"
             runtime_engine: "STANDARD"
@@ -427,8 +426,6 @@ resources:
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/data_quality/functional_testing
             source: WORKSPACE
-            base_parameters:
-              catalog_name: ${var.catalog_name}
           run_if: ALL_SUCCESS
         
         - task_key: data_quality_profiling
@@ -438,6 +435,5 @@ resources:
           notebook_task:
             notebook_path: ${var.repo_path}/src/notebooks/data_quality/data_quality_profiling
             source: WORKSPACE
-            base_parameters:
-              catalog_name: ${var.catalog_name}
+            base_parameters: {}
           run_if: ALL_SUCCESS

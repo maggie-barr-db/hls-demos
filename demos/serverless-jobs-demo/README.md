@@ -210,6 +210,30 @@ Deploy individual jobs via Databricks UI or API calls.
 
 ## Custom Environment Setup
 
+### Unity Catalog Volumes
+
+This demo uses three UC volumes for different purposes:
+
+1. **`landing`** - Source data for bronze ingestion
+   - Location: `/Volumes/{catalog}/synthea/landing/`
+   - Contains: Synthea CSV files
+
+2. **`admin_configs`** - Configuration and library management
+   - Location: `/Volumes/{catalog}/synthea/admin_configs/`
+   - Contains: `requirements.txt`, custom wheels, init scripts
+
+3. **`functional_testing`** - Test artifacts storage
+   - Location: `/Volumes/{catalog}/synthea/functional_testing/`
+   - Contains: Parquet files and test data from functional testing job
+
+**Create volumes:**
+```bash
+databricks workspace import-dir infrastructure/setup_volumes.sql
+# Or run the SQL directly in a notebook
+```
+
+### Deploy Serverless Environment
+
 Deploy a custom serverless environment with 15+ additional Python libraries:
 
 ```bash
@@ -217,7 +241,7 @@ Deploy a custom serverless environment with 15+ additional Python libraries:
 ```
 
 This creates:
-1. UC volume `/Volumes/{catalog}/synthea/admin_configs`
+1. UC volume `/Volumes/{catalog}/synthea/admin_configs` (if not exists)
 2. Uploads `requirements.txt` with custom libraries
 3. Creates environment `serverless_environment_demo`
 
@@ -366,7 +390,7 @@ This configuration allows you to make data-driven decisions about which compute 
 job_clusters:
   - job_cluster_key: classic_single_node
     new_cluster:
-      spark_version: "14.3.x-scala2.12"
+      spark_version: "13.3.x-scala2.12"
       node_type_id: "Standard_DS3_v2"
       num_workers: 0
 ```
