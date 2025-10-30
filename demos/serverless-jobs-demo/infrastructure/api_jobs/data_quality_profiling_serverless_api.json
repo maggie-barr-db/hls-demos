@@ -11,7 +11,8 @@
           "database_name": "prod",
           "location": "/Volumes/maggiedatabricksterraform_dbw/synthea/functional_testing"
         }
-      }
+      },
+      "environment_key": "serverless_override_environment"
     },
     {
       "task_key": "data_quality_profiling",
@@ -26,6 +27,18 @@
         "base_parameters": {
           "catalog_name": "maggiedatabricksterraform_dbw"
         }
+      },
+      "environment_key": "serverless_override_environment"
+    }
+  ],
+  "environments": [
+    {
+      "environment_key": "serverless_override_environment",
+      "spec": {
+        "dependencies": [
+          "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements_data_quality_serverless.txt"
+        ],
+        "client": "4"
       }
     }
   ],
