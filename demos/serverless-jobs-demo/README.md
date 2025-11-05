@@ -97,10 +97,9 @@ This demo showcases modern Databricks best practices and capabilities:
 - Same code works on both - just configuration changes
 
 ### 🛠️ **Flexible Deployment Methods**
-- **Databricks Asset Bundles (DAB)**: GitOps-friendly YAML configuration
 - **Jobs API**: JSON-based programmatic deployment for CI/CD
 - **Workspace-based**: Code deployed to `/Workspace/Shared/` for easy access
-- Side-by-side comparison of deployment approaches
+- Simple deployment script for automated job creation
 
 ### 📊 **Modular Code Structure**
 - Reusable utilities in `src/utils/` (`silver_control.py`)
@@ -127,10 +126,8 @@ cp variables.example.json variables.json
 # 2. Deploy custom Python environment (optional but recommended)
 ./deploy_environment.sh
 
-# 3. Deploy jobs
-databricks bundle deploy --target development \
-  --var catalog_name=$(jq -r .catalog_name variables.json) \
-  --var base_volume_path=$(jq -r .base_volume_path variables.json)
+# 3. Deploy jobs using API
+./deploy_all.sh
 
 # 4. Run bronze ingestion (serverless recommended)
 databricks jobs run-now --job-id <job_id>
@@ -169,42 +166,43 @@ Create `variables.json`:
 
 ## Deployment Options
 
-This demo provides three deployment methods:
+This demo uses API-based deployment:
 
-### 1. Databricks Asset Bundles (DAB) - Recommended
+### API Deployment - Recommended
 
 Deploy all jobs with a single command:
 ```bash
-databricks bundle deploy --target development \
-  --var catalog_name=$(jq -r .catalog_name variables.json) \
-  --var base_volume_path=$(jq -r .base_volume_path variables.json)
+./deploy_all.sh
+```
+
+Or deploy only the jobs:
+```bash
+./deploy_all.sh api
 ```
 
 **Jobs deployed:**
-- `daily_bronze_ingestion_incr_py_classic` - Bronze (Python, Classic)
-- `daily_bronze_ingestion_incr_py_serverless_dab` - Bronze (Python, Serverless)
-- `daily_bronze_ingestion_incr_nb_serverless_dab` - Bronze (Notebook, Serverless)
+- `daily_bronze_ingestion_incr_py_serverless_api` - Bronze (Python, Serverless)
+- `daily_bronze_ingestion_incr_nb_serverless_api` - Bronze (Notebook, Serverless)
 - `daily_silver_load_incr_py_classic` - Silver (Python, Classic)
-- `daily_silver_load_incr_py_serverless_dab` - Silver (Python, Serverless)
-- `daily_silver_load_incr_nb_serverless_dab` - Silver (Notebook, Serverless)
-
-###2. API Deployment
-
-Use the Jobs API for CI/CD integration:
-```bash
-cd api_jobs
-./deploy_jobs.sh
-```
+- `daily_silver_load_incr_py_serverless_api` - Silver (Python, Serverless)
+- `daily_silver_load_incr_nb_serverless_api` - Silver (Notebook, Serverless)
+- `data_quality_profiling_classic_api` - Data Quality (Notebook, Classic)
+- `data_quality_profiling_serverless_api` - Data Quality (Notebook, Serverless)
 
 **Advantages:**
 - ✅ Full control over deployment timing
 - ✅ Easy CI/CD integration
 - ✅ Programmatic deployment from any language
 - ✅ No bundle state to manage
+- ✅ Simple JSON configuration
 
-### 3. Manual Deployment
+### Manual Deployment
 
-Deploy individual jobs via Databricks UI or API calls.
+Deploy individual jobs via the Databricks CLI:
+```bash
+cd infrastructure/api_jobs
+databricks jobs create --json @daily_bronze_ingestion_incr_py_serverless_api.json
+```
 
 ---
 
@@ -426,46 +424,38 @@ environments:
 
 ---
 
-## API Deployment
+## Available Jobs
 
-Deploy jobs programmatically using the Databricks Jobs API.
+All jobs are defined in JSON format in `infrastructure/api_jobs/`:
 
-### Quick Deploy
+**Bronze Layer Jobs:**
+- `daily_bronze_ingestion_incr_py_serverless_api.json` - Python script version
+- `daily_bronze_ingestion_incr_nb_serverless_api.json` - Notebook version
 
-```bash
-cd api_jobs
-./deploy_jobs.sh
-```
+**Silver Layer Jobs:**
+- `daily_silver_load_incr_py_classic_api.json` - Python script, Classic compute
+- `daily_silver_load_incr_py_serverless_api.json` - Python script, Serverless compute
+- `daily_silver_load_incr_nb_serverless_api.json` - Notebook, Serverless compute
 
-### Manual Deployment
+**Data Quality Jobs:**
+- `data_quality_profiling_classic_api.json` - Classic compute with custom init scripts
+- `data_quality_profiling_serverless_api.json` - Serverless compute
+
+### Manual Job Management
 
 ```bash
 # Create a job
-databricks jobs create --json @api_jobs/daily_bronze_ingestion_incr_py_serverless_api.json
+databricks jobs create --json @infrastructure/api_jobs/daily_bronze_ingestion_incr_py_serverless_api.json
 
 # Update existing job
-databricks jobs reset <job_id> --json @api_jobs/daily_bronze_ingestion_incr_py_serverless_api.json
+databricks jobs reset <job_id> --json @infrastructure/api_jobs/daily_bronze_ingestion_incr_py_serverless_api.json
+
+# Delete a job
+databricks jobs delete <job_id>
+
+# List all jobs
+databricks jobs list
 ```
-
-### API vs DAB Comparison
-
-| Aspect | DAB | API |
-|--------|-----|-----|
-| **Deployment** | `databricks bundle deploy` | `databricks jobs create` |
-| **Variables** | Native `${var.}` support | Manual templating |
-| **Version Control** | YAML (human-readable) | JSON (machine-readable) |
-| **Validation** | Built-in | Manual |
-| **Best For** | GitOps workflows | CI/CD automation |
-
-### Available API Jobs
-
-**Python Scripts:**
-- `daily_bronze_ingestion_incr_py_serverless_api.json`
-- `daily_silver_load_incr_py_serverless_api.json`
-
-**Notebooks:**
-- `daily_bronze_ingestion_incr_nb_serverless_api.json`
-- `daily_silver_load_incr_nb_serverless_api.json`
 
 ---
 
@@ -473,35 +463,44 @@ databricks jobs reset <job_id> --json @api_jobs/daily_bronze_ingestion_incr_py_s
 
 ```
 demos/serverless-jobs-demo/
-├── databricks.yml                        # DAB configuration
+├── deploy_all.sh                         # Main deployment script
 ├── deploy_environment.sh                 # Environment deployment script
-├── requirements.txt                      # Custom Python libraries
 ├── variables.json                        # Your configuration
 │
-├── scripts/                              # Python scripts (Python jobs)
-│   ├── bronze/
-│   │   ├── bronze_ingest.py
-│   │   └── bronze_archive.py
-│   ├── silver/
-│   │   ├── silver_control.py
-│   │   └── load_fact_*.py (4 files)
-│   └── gold/
-│       └── load_fact_member_monthly_snapshot.py
+├── src/
+│   ├── scripts/                          # Python scripts (Python jobs)
+│   │   ├── bronze/
+│   │   │   ├── bronze_ingest.py
+│   │   │   └── bronze_archive.py
+│   │   ├── silver/
+│   │   │   └── load_fact_*.py (4 files)
+│   │   └── gold/
+│   │       └── load_fact_member_monthly_snapshot.py
+│   │
+│   ├── notebooks/                        # Jupyter notebooks (Notebook jobs)
+│   │   ├── bronze/
+│   │   │   ├── bronze_ingest.ipynb
+│   │   │   └── bronze_archive.ipynb
+│   │   ├── silver/
+│   │   │   └── load_fact_*.ipynb (4 files)
+│   │   ├── gold/
+│   │   │   └── load_fact_member_monthly_snapshot.ipynb
+│   │   └── data_quality/
+│   │       ├── data_quality_profiling.ipynb
+│   │       └── functional_testing.ipynb
+│   │
+│   └── utils/                            # Shared utilities
+│       ├── __init__.py
+│       └── silver_control.py
 │
-├── notebooks/                            # Jupyter notebooks (Notebook jobs)
-│   ├── bronze/
-│   │   ├── bronze_ingest.ipynb
-│   │   └── bronze_archive.ipynb
-│   ├── silver/
-│   │   ├── silver_control.py
-│   │   └── load_fact_*.ipynb (4 files)
-│   └── gold/
-│       ├── silver_control.py
-│       └── load_fact_member_monthly_snapshot.ipynb
-│
-└── api_jobs/                             # API deployment
-    ├── deploy_jobs.sh
-    └── *.json (4 job definitions)
+└── infrastructure/                       # Deployment configs
+    ├── api_jobs/                         # Job JSON definitions
+    │   ├── deploy_jobs.sh
+    │   └── *.json (7 job definitions)
+    ├── external_libs/                    # Custom wheels
+    ├── init_scripts/                     # Init scripts for classic compute
+    ├── requirements.txt                  # Python dependencies
+    └── requirements_data_quality_serverless.txt
 ```
 
 ---
@@ -510,7 +509,7 @@ demos/serverless-jobs-demo/
 
 ### Immediate
 1. ✅ Deploy custom environment: `./deploy_environment.sh`
-2. ✅ Deploy jobs: `databricks bundle deploy`
+2. ✅ Deploy jobs: `./deploy_all.sh`
 3. ✅ Run bronze ingestion
 4. ✅ Verify tables created
 5. ✅ Run example queries

@@ -10,10 +10,6 @@
 
 ### 2. Updated Configurations
 
-#### Databricks Asset Bundle (`databricks.yml`)
-- Updated `data_quality_profiling_classic` job
-- Changed `LOCATION` environment variable from `${var.base_volume_path}` to `/Volumes/maggiedatabricksterraform_dbw/synthea/functional_testing`
-
 #### API Job Definition (`data_quality_profiling_classic_api.json`)
 - Updated `LOCATION` environment variable from `/Volumes/maggiedatabricksterraform_dbw/synthea/landing` to `/Volumes/maggiedatabricksterraform_dbw/synthea/functional_testing`
 - Job ID: 280675826266083 ✓ Updated successfully
@@ -94,7 +90,6 @@
 
 ## Files Modified
 
-- `/databricks.yml`
 - `/infrastructure/api_jobs/data_quality_profiling_classic_api.json`
 - `/src/notebooks/data_quality/functional_testing.ipynb`
 - `/README.md`

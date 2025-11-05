@@ -6,16 +6,14 @@
 #
 #  This script deploys:
 #    1. Base environment YAML files to workspace
-#    2. DAB jobs (via databricks bundle deploy)
-#    3. API jobs (via Databricks CLI)
+#    2. API jobs (via Databricks CLI)
 #
 #  Usage:
-#    ./deploy_all.sh [all|envs|dab|api]
+#    ./deploy_all.sh [all|envs|api]
 #
 #  Options:
 #    all   - Deploy everything (default)
 #    envs  - Only upload base environment YAML files
-#    dab   - Only deploy DAB jobs
 #    api   - Only deploy API jobs
 #
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -36,22 +34,21 @@ DEPLOY_MODE="${1:-all}"
 
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${CYAN}${BOLD}  HLS Serverless Jobs Demo - Unified Deployment${NC}"
+echo -e "${CYAN}${BOLD}  HLS Serverless Jobs Demo - API Deployment${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo "Deployment mode: ${DEPLOY_MODE}"
 echo ""
 
 # Validate deployment mode
-if [[ ! "$DEPLOY_MODE" =~ ^(all|envs|dab|api)$ ]]; then
+if [[ ! "$DEPLOY_MODE" =~ ^(all|envs|api)$ ]]; then
     echo -e "${RED}❌ Error: Invalid deployment mode${NC}"
     echo ""
-    echo "Usage: $0 [all|envs|dab|api]"
+    echo "Usage: $0 [all|envs|api]"
     echo ""
     echo "Options:"
     echo "  all   - Deploy everything (default)"
     echo "  envs  - Only upload base environment YAML files"
-    echo "  dab   - Only deploy DAB jobs"
     echo "  api   - Only deploy API jobs"
     exit 1
 fi
@@ -211,59 +208,12 @@ deploy_base_environments() {
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Function: Deploy DAB Jobs
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-deploy_dab_jobs() {
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}  Step 2: Deploy DAB Jobs${NC}"
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo ""
-    
-    echo -e "${YELLOW}ℹ️  Jobs will reference code from Workspace${NC}"
-    echo "   Workspace path: /Workspace/Shared/hls-demos/demos/serverless-jobs-demo"
-    echo ""
-    
-    # Read usage policy ID if it exists
-    USAGE_POLICY_ID=""
-    if [ -f "infrastructure/.usage_policy_id" ] && [ -s "infrastructure/.usage_policy_id" ]; then
-        USAGE_POLICY_ID=$(cat infrastructure/.usage_policy_id | tr -d '[:space:]')
-        if [ -n "$USAGE_POLICY_ID" ]; then
-            echo "Using usage policy ID: ${USAGE_POLICY_ID}"
-        fi
-    else
-        echo -e "${YELLOW}⚠️  No usage policy ID found. Jobs will deploy without usage policy.${NC}"
-    fi
-    echo ""
-    
-    echo "Deploying Databricks Asset Bundle..."
-    databricks bundle deploy --target development \
-        --var catalog_name="${CATALOG_NAME}" \
-        --var base_volume_path="${BASE_VOLUME_PATH}" \
-        --var env="Production" \
-        --var repo_path="/Workspace/Shared/hls-demos/demos/serverless-jobs-demo" \
-        --var budget_policy_id="${USAGE_POLICY_ID}"
-    
-    echo ""
-    echo -e "${GREEN}✓${NC} DAB jobs deployed successfully"
-    echo ""
-    echo "Deployed jobs:"
-    echo "  • daily_bronze_ingestion_incr_py_serverless_dab"
-    echo "  • daily_silver_load_incr_py_serverless_dab"
-    echo "  • daily_bronze_ingestion_incr_nb_serverless_dab"
-    echo "  • daily_silver_load_incr_nb_serverless_dab"
-    echo ""
-    echo -e "${YELLOW}📝 Note: Jobs read code from Workspace files${NC}"
-    echo ""
-}
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Function: Deploy API Jobs
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 deploy_api_jobs() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}  Step 3: Deploy API Jobs${NC}"
+    echo -e "${BLUE}  Step 2: Deploy API Jobs${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
@@ -346,14 +296,10 @@ case "$DEPLOY_MODE" in
     all)
         deploy_usage_policy
         deploy_base_environments
-        deploy_dab_jobs
         deploy_api_jobs
         ;;
     envs)
         deploy_base_environments
-        ;;
-    dab)
-        deploy_dab_jobs
         ;;
     api)
         deploy_api_jobs
