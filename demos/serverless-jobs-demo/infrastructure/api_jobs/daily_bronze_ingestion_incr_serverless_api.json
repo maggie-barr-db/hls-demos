@@ -7,8 +7,8 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/bronze/bronze_ingest",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
-          "base_volume_path": "/Volumes/mbarrett/synthea/landing"
+          "catalog_name": "{{CATALOG_NAME}}",
+          "base_volume_path": "/Volumes/{{CATALOG_NAME}}/synthea/landing"
         }
       },
       "environment_key": "serverless_environment_demo"
@@ -25,9 +25,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "mbarrett",
+          "{{CATALOG_NAME}}",
           "--base_volume_path",
-          "/Volumes/mbarrett/synthea/landing"
+          "/Volumes/{{CATALOG_NAME}}/synthea/landing"
         ]
       },
       "environment_key": "serverless_environment_demo"
@@ -42,7 +42,7 @@
       "spec": {
         "client": "4",
         "dependencies": [
-          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
+          "-r /Volumes/{{CATALOG_NAME}}/synthea/admin_configs/requirements.txt"
         ]
       }
     }

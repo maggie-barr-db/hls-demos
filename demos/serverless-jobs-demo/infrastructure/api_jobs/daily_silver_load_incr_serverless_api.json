@@ -7,7 +7,7 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_claims",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
+          "catalog_name": "{{CATALOG_NAME}}",
           "load_type": "full"
         }
       },
@@ -19,7 +19,7 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_medications",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
+          "catalog_name": "{{CATALOG_NAME}}",
           "load_type": "full"
         }
       },
@@ -31,7 +31,7 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_patient_encounters",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
+          "catalog_name": "{{CATALOG_NAME}}",
           "load_type": "full"
         }
       },
@@ -43,7 +43,7 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_procedures",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
+          "catalog_name": "{{CATALOG_NAME}}",
           "load_type": "full"
         }
       },
@@ -70,7 +70,7 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "mbarrett"
+          "{{CATALOG_NAME}}"
         ]
       },
       "libraries": [],
@@ -86,7 +86,7 @@
       "spec": {
         "client": "4",
         "dependencies": [
-          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
+          "-r /Volumes/{{CATALOG_NAME}}/synthea/admin_configs/requirements.txt"
         ]
       }
     }

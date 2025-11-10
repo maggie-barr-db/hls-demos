@@ -35,8 +35,8 @@
           "spark.master": "local[*]"
         },
         "spark_env_vars": {
-          "catalog_name": "mbarrett",
-          "base_volume_path": "/Volumes/mbarrett/synthea/landing"
+          "catalog_name": "{{CATALOG_NAME}}",
+          "base_volume_path": "/Volumes/{{CATALOG_NAME}}/synthea/landing"
         },
         "data_security_mode": "SINGLE_USER",
         "runtime_engine": "STANDARD",
@@ -46,7 +46,7 @@
         "init_scripts": [
           {
             "volumes": {
-              "destination": "/Volumes/mbarrett/synthea/admin_configs/install_faker_wheel.sh"
+              "destination": "/Volumes/{{CATALOG_NAME}}/synthea/admin_configs/install_faker_wheel.sh"
             }
           }
         ]

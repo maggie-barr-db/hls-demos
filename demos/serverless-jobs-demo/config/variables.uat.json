@@ -1,0 +1,6 @@
+{
+  "catalog_name": "uat",
+  "base_volume_path": "/Volumes/uat/synthea/landing",
+  "admin_volume_path": "/Volumes/uat/synthea/admin_configs"
+}
+
