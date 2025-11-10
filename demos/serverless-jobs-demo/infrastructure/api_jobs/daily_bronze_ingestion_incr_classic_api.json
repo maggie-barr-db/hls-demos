@@ -1,5 +1,5 @@
 {
-  "name": "daily_bronze_ingestion_incr_nb_classic_api",
+  "name": "daily_bronze_ingestion_incr_classic_api",
   "tasks": [
     {
       "task_key": "bronze_ingest",
@@ -16,8 +16,8 @@
           "task_key": "bronze_ingest"
         }
       ],
-      "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/bronze/bronze_archive",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/bronze/bronze_archive.py",
         "source": "WORKSPACE"
       },
       "job_cluster_key": "classic_single_node"
