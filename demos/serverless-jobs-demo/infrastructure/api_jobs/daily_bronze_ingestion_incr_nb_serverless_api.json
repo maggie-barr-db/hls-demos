@@ -4,7 +4,7 @@
     {
       "task_key": "bronze_ingest",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/notebooks/bronze/bronze_ingest",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/bronze/bronze_ingest",
         "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "mbarrett",
@@ -21,7 +21,7 @@
         }
       ],
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/notebooks/bronze/bronze_archive",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/bronze/bronze_archive",
         "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "mbarrett",

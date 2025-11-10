@@ -1,10 +1,10 @@
 {
-  "name": "daily_silver_load_incr_mixed_classic_api",
+  "name": "daily_silver_load_incr_classic_api",
   "tasks": [
     {
       "task_key": "load_claims_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_claims",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/silver/load_fact_claims",
         "source": "WORKSPACE",
         "base_parameters": {
           "load_type": "full"
@@ -15,7 +15,7 @@
     {
       "task_key": "load_medications_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_medications",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/silver/load_fact_medications",
         "source": "WORKSPACE",
         "base_parameters": {
           "load_type": "full"
@@ -26,7 +26,7 @@
     {
       "task_key": "load_patient_encounters_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_patient_encounters",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/silver/load_fact_patient_encounters",
         "source": "WORKSPACE",
         "base_parameters": {
           "load_type": "full"
@@ -37,7 +37,7 @@
     {
       "task_key": "load_procedures_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_procedures",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/silver/load_fact_procedures",
         "source": "WORKSPACE",
         "base_parameters": {
           "load_type": "full"
@@ -62,7 +62,7 @@
         }
       ],
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/scripts/gold/load_fact_member_monthly_snapshot.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/gold/load_fact_member_monthly_snapshot.py",
         "source": "WORKSPACE"
       },
       "job_cluster_key": "classic_single_node"
