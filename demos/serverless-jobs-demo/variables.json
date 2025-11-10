@@ -1,6 +1,7 @@
 {
-  "catalog_name": "maggiedatabricksterraform_dbw",
-  "base_volume_path": "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
+  "catalog_name": "mbarrett",
+  "base_volume_path": "/Volumes/mbarrett/synthea/landing",
+  "admin_volume_path": "/Volumes/mbarrett/synthea/admin_configs"
 }
 
 
