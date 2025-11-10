@@ -8,9 +8,9 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "maggiedatabricksterraform_dbw",
+          "mbarrett",
           "--base_volume_path",
-          "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
+          "/Volumes/mbarrett/synthea/landing"
         ]
       },
       "environment_key": "serverless_environment_demo"
@@ -27,7 +27,7 @@
         "source": "WORKSPACE",
         "parameters": [
           "--base_volume_path",
-          "/Volumes/maggiedatabricksterraform_dbw/synthea/landing"
+          "/Volumes/mbarrett/synthea/landing"
         ]
       },
       "environment_key": "serverless_environment_demo"
@@ -42,7 +42,7 @@
       "spec": {
         "client": "4",
         "dependencies": [
-          "-r /Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/requirements.txt"
+          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
         ]
       }
     }

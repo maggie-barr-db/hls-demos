@@ -1,5 +1,5 @@
 {
-  "name": "daily_silver_load_incr_nb_serverless_api",
+  "name": "daily_silver_load_incr_nb_classic_api",
   "tasks": [
     {
       "task_key": "load_claims_silver",
@@ -11,7 +11,7 @@
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "job_cluster_key": "classic_single_node"
     },
     {
       "task_key": "load_medications_silver",
@@ -23,7 +23,7 @@
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "job_cluster_key": "classic_single_node"
     },
     {
       "task_key": "load_patient_encounters_silver",
@@ -35,7 +35,7 @@
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "job_cluster_key": "classic_single_node"
     },
     {
       "task_key": "load_procedures_silver",
@@ -47,7 +47,7 @@
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "job_cluster_key": "classic_single_node"
     },
     {
       "task_key": "load_member_monthly_snapshot_gold",
@@ -72,20 +72,25 @@
           "catalog_name": "mbarrett"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "job_cluster_key": "classic_single_node"
     }
   ],
-  "queue": {
-    "enabled": true
-  },
-  "environments": [
+  "job_clusters": [
     {
-      "environment_key": "serverless_environment_demo",
-      "spec": {
-        "client": "4",
-        "dependencies": [
-          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
-        ]
+      "job_cluster_key": "classic_single_node",
+      "new_cluster": {
+        "spark_version": "13.3.x-scala2.12",
+        "node_type_id": "Standard_DS3_v2",
+        "num_workers": 0,
+        "spark_conf": {
+          "spark.databricks.cluster.profile": "singleNode",
+          "spark.master": "local[*]"
+        },
+        "data_security_mode": "SINGLE_USER",
+        "runtime_engine": "STANDARD",
+        "custom_tags": {
+          "ResourceClass": "SingleNode"
+        }
       }
     }
   ],
@@ -94,8 +99,7 @@
     "timezone_id": "UTC",
     "pause_status": "PAUSED"
   },
-  "budget_policy_id": "{{USAGE_POLICY_ID}}",
   "max_concurrent_runs": 1,
-  "format": "MULTI_TASK",
-  "performance_target": "PERFORMANCE_OPTIMIZED"
+  "format": "MULTI_TASK"
 }
+

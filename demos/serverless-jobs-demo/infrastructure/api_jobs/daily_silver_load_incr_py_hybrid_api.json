@@ -1,5 +1,5 @@
 {
-  "name": "daily_silver_load_incr_py_classic_api",
+  "name": "daily_silver_load_incr_py_hybrid_api",
   "tasks": [
     {
       "task_key": "load_claims_silver",
@@ -13,7 +13,8 @@
           "full"
         ]
       },
-      "job_cluster_key": "classic_single_node"
+      "libraries": [],
+      "environment_key": "serverless_environment_demo"
     },
     {
       "task_key": "load_patient_encounters_silver",
@@ -27,7 +28,8 @@
           "full"
         ]
       },
-      "job_cluster_key": "classic_single_node"
+      "libraries": [],
+      "environment_key": "serverless_environment_demo"
     },
     {
       "task_key": "load_medications_silver",
@@ -41,7 +43,8 @@
           "full"
         ]
       },
-      "job_cluster_key": "classic_single_node"
+      "libraries": [],
+      "environment_key": "serverless_environment_demo"
     },
     {
       "task_key": "load_procedures_silver",
@@ -55,7 +58,8 @@
           "full"
         ]
       },
-      "job_cluster_key": "classic_single_node"
+      "libraries": [],
+      "environment_key": "serverless_environment_demo"
     },
     {
       "task_key": "load_member_monthly_snapshot_gold",
@@ -81,6 +85,7 @@
           "mbarrett"
         ]
       },
+      "libraries": [],
       "job_cluster_key": "classic_single_node"
     }
   ],
@@ -98,16 +103,32 @@
         "data_security_mode": "SINGLE_USER",
         "runtime_engine": "STANDARD",
         "custom_tags": {
-          "ResourceClass": "SingleNode"
+          "ResourceClass": "SingleNode",
+          "ComputeType": "Hybrid"
         }
+      }
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "environments": [
+    {
+      "environment_key": "serverless_environment_demo",
+      "spec": {
+        "client": "4",
+        "dependencies": [
+          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
+        ]
       }
     }
   ],
   "schedule": {
     "quartz_cron_expression": "0 30 2 * * ?",
-    "timezone_id": "America/Los_Angeles",
+    "timezone_id": "UTC",
     "pause_status": "PAUSED"
   },
   "max_concurrent_runs": 1,
   "format": "MULTI_TASK"
 }
+
