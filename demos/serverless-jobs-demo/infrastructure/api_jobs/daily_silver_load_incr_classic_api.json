@@ -89,8 +89,8 @@
         },
         "init_scripts": [
           {
-            "workspace": {
-              "destination": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/infrastructure/init_scripts/install_faker_wheel.sh"
+            "volumes": {
+              "destination": "/Volumes/mbarrett/synthea/admin_configs/install_faker_wheel.sh"
             }
           }
         ]
