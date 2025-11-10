@@ -13,7 +13,7 @@ echo "Installing Faker Wheel on Classic Cluster"
 echo "=========================================="
 
 # Define wheel location in Unity Catalog Volume
-WHEEL_PATH="/Volumes/maggiedatabricksterraform_dbw/synthea/admin_configs/faker_lib-0.1.0-py3-none-any.whl"
+WHEEL_PATH="/Volumes/mbarrett/synthea/admin_configs/faker_lib-0.1.0-py3-none-any.whl"
 
 # Check if wheel exists
 if [ -f "$WHEEL_PATH" ]; then

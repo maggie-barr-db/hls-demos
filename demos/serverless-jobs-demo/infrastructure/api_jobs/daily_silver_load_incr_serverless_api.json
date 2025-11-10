@@ -1,10 +1,10 @@
 {
-  "name": "daily_silver_load_incr_nb_serverless_api",
+  "name": "daily_silver_load_incr_serverless_api",
   "tasks": [
     {
       "task_key": "load_claims_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_claims",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_claims",
         "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "mbarrett",
@@ -16,7 +16,7 @@
     {
       "task_key": "load_medications_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_medications",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_medications",
         "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "mbarrett",
@@ -28,7 +28,7 @@
     {
       "task_key": "load_patient_encounters_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_patient_encounters",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_patient_encounters",
         "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "mbarrett",
@@ -40,7 +40,7 @@
     {
       "task_key": "load_procedures_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_procedures",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_procedures",
         "source": "WORKSPACE",
         "base_parameters": {
           "catalog_name": "mbarrett",
@@ -65,13 +65,15 @@
           "task_key": "load_procedures_silver"
         }
       ],
-      "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/gold/load_fact_member_monthly_snapshot",
+      "spark_python_task": {
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/gold/load_fact_member_monthly_snapshot.py",
         "source": "WORKSPACE",
-        "base_parameters": {
-          "catalog_name": "mbarrett"
-        }
+        "parameters": [
+          "--catalog_name",
+          "mbarrett"
+        ]
       },
+      "libraries": [],
       "environment_key": "serverless_environment_demo"
     }
   ],
@@ -99,3 +101,4 @@
   "format": "MULTI_TASK",
   "performance_target": "PERFORMANCE_OPTIMIZED"
 }
+

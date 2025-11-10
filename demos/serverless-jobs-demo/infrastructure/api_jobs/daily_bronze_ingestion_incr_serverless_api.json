@@ -1,17 +1,15 @@
 {
-  "name": "daily_bronze_ingestion_incr_py_serverless_api",
+  "name": "daily_bronze_ingestion_incr_serverless_api",
   "tasks": [
     {
       "task_key": "bronze_ingest",
-      "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/bronze/bronze_ingest.py",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/bronze/bronze_ingest",
         "source": "WORKSPACE",
-        "parameters": [
-          "--catalog_name",
-          "mbarrett",
-          "--base_volume_path",
-          "/Volumes/mbarrett/synthea/landing"
-        ]
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "base_volume_path": "/Volumes/mbarrett/synthea/landing"
+        }
       },
       "environment_key": "serverless_environment_demo"
     },
@@ -23,9 +21,11 @@
         }
       ],
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/bronze/bronze_archive.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/bronze/bronze_archive.py",
         "source": "WORKSPACE",
         "parameters": [
+          "--catalog_name",
+          "mbarrett",
           "--base_volume_path",
           "/Volumes/mbarrett/synthea/landing"
         ]
@@ -54,5 +54,6 @@
   },
   "budget_policy_id": "{{USAGE_POLICY_ID}}",
   "max_concurrent_runs": 1,
-  "format": "MULTI_TASK"
+  "format": "MULTI_TASK",
+  "performance_target": "PERFORMANCE_OPTIMIZED"
 }
