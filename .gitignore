@@ -1,0 +1,41 @@
+# Personal notes and questions
+open_questions.txt
+
+# Wheel package build artifacts
+demos/serverless-jobs-demo/hls_external_libs/build/
+demos/serverless-jobs-demo/hls_external_libs/dist/
+demos/serverless-jobs-demo/hls_external_libs/*.egg-info/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Databricks
+.databricks/
+*.json.bak
+demos/serverless-jobs-demo/infrastructure/.usage_policy_id
+
+# Logs
+*.log
+

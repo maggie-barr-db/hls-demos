@@ -1,0 +1,101 @@
+{
+  "name": "daily_silver_load_incr_nb_serverless_api",
+  "tasks": [
+    {
+      "task_key": "load_claims_silver",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_claims",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "load_type": "full"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    },
+    {
+      "task_key": "load_medications_silver",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_medications",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "load_type": "full"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    },
+    {
+      "task_key": "load_patient_encounters_silver",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_patient_encounters",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "load_type": "full"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    },
+    {
+      "task_key": "load_procedures_silver",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_procedures",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "load_type": "full"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    },
+    {
+      "task_key": "load_member_monthly_snapshot_gold",
+      "depends_on": [
+        {
+          "task_key": "load_claims_silver"
+        },
+        {
+          "task_key": "load_medications_silver"
+        },
+        {
+          "task_key": "load_patient_encounters_silver"
+        },
+        {
+          "task_key": "load_procedures_silver"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/gold/load_fact_member_monthly_snapshot",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "environments": [
+    {
+      "environment_key": "serverless_environment_demo",
+      "spec": {
+        "client": "4",
+        "dependencies": [
+          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
+        ]
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 30 2 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "budget_policy_id": "{{USAGE_POLICY_ID}}",
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK",
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}

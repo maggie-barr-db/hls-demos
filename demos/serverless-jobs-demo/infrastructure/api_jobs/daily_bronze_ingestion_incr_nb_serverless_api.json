@@ -1,0 +1,57 @@
+{
+  "name": "daily_bronze_ingestion_incr_nb_serverless_api",
+  "tasks": [
+    {
+      "task_key": "bronze_ingest",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/bronze/bronze_ingest",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "base_volume_path": "/Volumes/mbarrett/synthea/landing"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    },
+    {
+      "task_key": "bronze_archive",
+      "depends_on": [
+        {
+          "task_key": "bronze_ingest"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/bronze/bronze_archive",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog_name": "mbarrett",
+          "base_volume_path": "/Volumes/mbarrett/synthea/landing"
+        }
+      },
+      "environment_key": "serverless_environment_demo"
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "environments": [
+    {
+      "environment_key": "serverless_environment_demo",
+      "spec": {
+        "client": "4",
+        "dependencies": [
+          "-r /Volumes/mbarrett/synthea/admin_configs/requirements.txt"
+        ]
+      }
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 0 2 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED"
+  },
+  "budget_policy_id": "{{USAGE_POLICY_ID}}",
+  "max_concurrent_runs": 1,
+  "format": "MULTI_TASK",
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}
