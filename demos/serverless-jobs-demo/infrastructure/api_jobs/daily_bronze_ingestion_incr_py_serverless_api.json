@@ -4,7 +4,7 @@
     {
       "task_key": "bronze_ingest",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/bronze/bronze_ingest.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/bronze/bronze_ingest.py",
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
@@ -23,7 +23,7 @@
         }
       ],
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/bronze/bronze_archive.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/bronze/bronze_archive.py",
         "source": "WORKSPACE",
         "parameters": [
           "--base_volume_path",

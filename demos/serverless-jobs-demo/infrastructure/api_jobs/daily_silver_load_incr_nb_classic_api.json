@@ -4,10 +4,9 @@
     {
       "task_key": "load_claims_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_claims",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_claims",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
           "load_type": "full"
         }
       },
@@ -16,10 +15,9 @@
     {
       "task_key": "load_medications_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_medications",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_medications",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
           "load_type": "full"
         }
       },
@@ -28,10 +26,9 @@
     {
       "task_key": "load_patient_encounters_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_patient_encounters",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_patient_encounters",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
           "load_type": "full"
         }
       },
@@ -40,10 +37,9 @@
     {
       "task_key": "load_procedures_silver",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/silver/load_fact_procedures",
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/silver/load_fact_procedures",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "mbarrett",
           "load_type": "full"
         }
       },
@@ -66,11 +62,8 @@
         }
       ],
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/notebooks/gold/load_fact_member_monthly_snapshot",
-        "source": "WORKSPACE",
-        "base_parameters": {
-          "catalog_name": "mbarrett"
-        }
+        "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/notebooks/gold/load_fact_member_monthly_snapshot",
+        "source": "WORKSPACE"
       },
       "job_cluster_key": "classic_single_node"
     }
@@ -85,6 +78,9 @@
         "spark_conf": {
           "spark.databricks.cluster.profile": "singleNode",
           "spark.master": "local[*]"
+        },
+        "spark_env_vars": {
+          "catalog_name": "mbarrett"
         },
         "data_security_mode": "SINGLE_USER",
         "runtime_engine": "STANDARD",
@@ -102,4 +98,3 @@
   "max_concurrent_runs": 1,
   "format": "MULTI_TASK"
 }
-

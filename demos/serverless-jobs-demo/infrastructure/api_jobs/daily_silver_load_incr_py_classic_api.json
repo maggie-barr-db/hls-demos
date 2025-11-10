@@ -4,11 +4,9 @@
     {
       "task_key": "load_claims_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_claims.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/scripts/silver/load_fact_claims.py",
         "source": "WORKSPACE",
         "parameters": [
-          "--catalog_name",
-          "mbarrett",
           "--load_type",
           "full"
         ]
@@ -18,11 +16,9 @@
     {
       "task_key": "load_patient_encounters_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_patient_encounters.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/scripts/silver/load_fact_patient_encounters.py",
         "source": "WORKSPACE",
         "parameters": [
-          "--catalog_name",
-          "mbarrett",
           "--load_type",
           "full"
         ]
@@ -32,11 +28,9 @@
     {
       "task_key": "load_medications_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_medications.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/scripts/silver/load_fact_medications.py",
         "source": "WORKSPACE",
         "parameters": [
-          "--catalog_name",
-          "mbarrett",
           "--load_type",
           "full"
         ]
@@ -46,11 +40,9 @@
     {
       "task_key": "load_procedures_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_procedures.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/scripts/silver/load_fact_procedures.py",
         "source": "WORKSPACE",
         "parameters": [
-          "--catalog_name",
-          "mbarrett",
           "--load_type",
           "full"
         ]
@@ -74,12 +66,8 @@
         }
       ],
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/gold/load_fact_member_monthly_snapshot.py",
-        "source": "WORKSPACE",
-        "parameters": [
-          "--catalog_name",
-          "mbarrett"
-        ]
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/classic/scripts/gold/load_fact_member_monthly_snapshot.py",
+        "source": "WORKSPACE"
       },
       "job_cluster_key": "classic_single_node"
     }
@@ -94,6 +82,9 @@
         "spark_conf": {
           "spark.databricks.cluster.profile": "singleNode",
           "spark.master": "local[*]"
+        },
+        "spark_env_vars": {
+          "catalog_name": "mbarrett"
         },
         "data_security_mode": "SINGLE_USER",
         "runtime_engine": "STANDARD",

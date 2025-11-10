@@ -4,7 +4,7 @@
     {
       "task_key": "load_claims_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_claims.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/silver/load_fact_claims.py",
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
@@ -19,7 +19,7 @@
     {
       "task_key": "load_patient_encounters_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_patient_encounters.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/silver/load_fact_patient_encounters.py",
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
@@ -34,7 +34,7 @@
     {
       "task_key": "load_medications_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_medications.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/silver/load_fact_medications.py",
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
@@ -49,7 +49,7 @@
     {
       "task_key": "load_procedures_silver",
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/silver/load_fact_procedures.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/silver/load_fact_procedures.py",
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
@@ -78,7 +78,7 @@
         }
       ],
       "spark_python_task": {
-        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/scripts/gold/load_fact_member_monthly_snapshot.py",
+        "python_file": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/scripts/gold/load_fact_member_monthly_snapshot.py",
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
