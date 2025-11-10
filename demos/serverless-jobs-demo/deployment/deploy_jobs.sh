@@ -31,20 +31,23 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Determine which variables file to use
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 if [ -z "$ENVIRONMENT" ]; then
-    VARS_FILE="variables.json"
-    echo -e "${BLUE}ℹ️  Using default configuration: ${VARS_FILE}${NC}"
+    VARS_FILE="$PROJECT_ROOT/config/variables.json"
+    echo -e "${BLUE}ℹ️  Using default configuration: config/variables.json${NC}"
 else
-    VARS_FILE="variables.${ENVIRONMENT}.json"
+    VARS_FILE="$PROJECT_ROOT/config/variables.${ENVIRONMENT}.json"
     if [ ! -f "$VARS_FILE" ]; then
-        echo -e "${RED}✗ Error: Variables file not found: ${VARS_FILE}${NC}"
+        echo -e "${RED}✗ Error: Variables file not found: config/variables.${ENVIRONMENT}.json${NC}"
         echo ""
         echo "Available environments:"
-        ls variables.*.json 2>/dev/null | sed 's/variables\.\(.*\)\.json/  - \1/'
+        ls "$PROJECT_ROOT/config/variables."*.json 2>/dev/null | xargs -n1 basename | sed 's/variables\.\(.*\)\.json/  - \1/'
         echo ""
         exit 1
     fi
-    echo -e "${GREEN}✓ Using ${ENVIRONMENT} configuration: ${VARS_FILE}${NC}"
+    echo -e "${GREEN}✓ Using ${ENVIRONMENT} configuration: config/variables.${ENVIRONMENT}.json${NC}"
 fi
 
 echo ""
@@ -70,7 +73,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Process each job JSON file
-cd infrastructure/api_jobs
+cd "$PROJECT_ROOT/infrastructure/api_jobs"
 JOB_COUNT=0
 
 for job_file in *.json; do

@@ -2,6 +2,15 @@
 
 This guide explains how to deploy jobs across different environments (dev, uat, prod) without modifying job JSON files.
 
+## Quick Navigation
+
+- [Overview](#overview)
+- [Directory Structure](#directory-structure)
+- [Configuration Files](#configuration-files)
+- [Usage](#usage)
+- [CI/CD Integration](#cicd-integration)
+- [Best Practices](#best-practices)
+
 ## Overview
 
 The deployment system uses **template placeholders** in job JSON files that are replaced with environment-specific values at deployment time.
@@ -16,13 +25,19 @@ The deployment system uses **template placeholders** in job JSON files that are 
 
 ```
 demos/serverless-jobs-demo/
-├── variables.json              # Default/local development config
-├── variables.dev.json          # Development environment config
-├── variables.uat.json          # UAT environment config  
-├── variables.prod.json         # Production environment config
-├── deploy_jobs.sh              # Deployment script
+├── config/                     # Environment-specific configurations
+│   ├── variables.json          # Default/local development config
+│   ├── variables.dev.json      # Development environment config
+│   ├── variables.uat.json      # UAT environment config  
+│   └── variables.prod.json     # Production environment config
+│
+├── deployment/                 # Deployment scripts (you are here!)
+│   ├── deploy_jobs.sh         # Multi-environment job deployment
+│   ├── deploy_all.sh          # Full stack deployment
+│   └── README.md              # This file
+│
 └── infrastructure/
-    └── api_jobs/               # Job definitions with placeholders
+    └── api_jobs/              # Job definitions with placeholders
         ├── daily_bronze_ingestion_incr_classic_api.json
         ├── daily_bronze_ingestion_incr_serverless_api.json
         ├── daily_silver_load_incr_classic_api.json
@@ -51,29 +66,41 @@ demos/serverless-jobs-demo/
 
 ## Usage
 
+**Note:** Run all deployment commands from the `deployment/` directory.
+
+```bash
+cd deployment
+```
+
 ### Deploy to Default Environment
 ```bash
 ./deploy_jobs.sh
 ```
-Uses `variables.json`
+Uses `config/variables.json`
 
 ### Deploy to Development
 ```bash
 ./deploy_jobs.sh dev
 ```
-Uses `variables.dev.json`
+Uses `config/variables.dev.json`
 
 ### Deploy to UAT
 ```bash
 ./deploy_jobs.sh uat
 ```
-Uses `variables.uat.json`
+Uses `config/variables.uat.json`
 
 ### Deploy to Production
 ```bash
 ./deploy_jobs.sh prod
 ```
-Uses `variables.prod.json`
+Uses `config/variables.prod.json`
+
+### Full Stack Deployment
+```bash
+./deploy_all.sh
+```
+Deploys volumes, uploads code, and creates all jobs using default config
 
 ## How It Works
 

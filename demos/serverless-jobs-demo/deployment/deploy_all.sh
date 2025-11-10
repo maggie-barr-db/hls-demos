@@ -78,20 +78,25 @@ if ! databricks auth whoami &> /dev/null; then
 fi
 echo -e "${GREEN}✓${NC} Authenticated with Databricks"
 
+# Get script and project directories
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+VARS_FILE="$PROJECT_ROOT/config/variables.json"
+
 # Check for required files
-if [ ! -f "variables.json" ]; then
-    echo -e "${RED}❌ Error: variables.json not found${NC}"
-    echo "   Create it from variables.example.json"
+if [ ! -f "$VARS_FILE" ]; then
+    echo -e "${RED}❌ Error: config/variables.json not found${NC}"
+    echo "   Create configuration file in config/ directory"
     exit 1
 fi
 echo -e "${GREEN}✓${NC} Configuration file found"
 
 # Read configuration
-CATALOG_NAME=$(jq -r '.catalog_name' variables.json)
-BASE_VOLUME_PATH=$(jq -r '.base_volume_path' variables.json)
+CATALOG_NAME=$(jq -r '.catalog_name' "$VARS_FILE")
+BASE_VOLUME_PATH=$(jq -r '.base_volume_path' "$VARS_FILE")
 
 if [ -z "$CATALOG_NAME" ] || [ "$CATALOG_NAME" = "null" ]; then
-    echo -e "${RED}❌ Error: catalog_name not set in variables.json${NC}"
+    echo -e "${RED}❌ Error: catalog_name not set in config/variables.json${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓${NC} Configuration valid"
@@ -127,15 +132,15 @@ deploy_usage_policy() {
     echo ""
     
     # Check if policy ID already exists
-    if [ -f "infrastructure/.usage_policy_id" ]; then
-        POLICY_ID=$(cat infrastructure/.usage_policy_id)
+    if [ -f "$PROJECT_ROOT/infrastructure/.usage_policy_id" ]; then
+        POLICY_ID=$(cat "$PROJECT_ROOT/infrastructure/.usage_policy_id")
         echo -e "${GREEN}✓${NC} Usage policy ID found: ${POLICY_ID}"
         echo -e "${GREEN}✓${NC} Jobs will be attached to this policy"
     else
         echo -e "${YELLOW}ℹ️  No policy ID found. Jobs will deploy without usage policy.${NC}"
         echo -e "${YELLOW}   Create the policy in UI and redeploy to attach it.${NC}"
         # Create empty file so deployments don't fail
-        echo "" > infrastructure/.usage_policy_id
+        echo "" > "$PROJECT_ROOT/infrastructure/.usage_policy_id"
     fi
     echo ""
 }
@@ -223,8 +228,8 @@ deploy_api_jobs() {
     
     # Read usage policy ID
     USAGE_POLICY_ID=""
-    if [ -f "infrastructure/.usage_policy_id" ] && [ -s "infrastructure/.usage_policy_id" ]; then
-        USAGE_POLICY_ID=$(cat infrastructure/.usage_policy_id | tr -d '[:space:]')
+    if [ -f "$PROJECT_ROOT/infrastructure/.usage_policy_id" ] && [ -s "$PROJECT_ROOT/infrastructure/.usage_policy_id" ]; then
+        USAGE_POLICY_ID=$(cat "$PROJECT_ROOT/infrastructure/.usage_policy_id" | tr -d '[:space:]')
         if [ -n "$USAGE_POLICY_ID" ]; then
             echo "Using usage policy ID: ${USAGE_POLICY_ID}"
         fi
@@ -235,7 +240,7 @@ deploy_api_jobs() {
     fi
     echo ""
     
-    cd infrastructure/api_jobs
+    cd "$PROJECT_ROOT/infrastructure/api_jobs"
     
     for json_file in *.json; do
         if [ -f "$json_file" ]; then
