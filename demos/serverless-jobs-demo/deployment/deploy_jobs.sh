@@ -54,10 +54,12 @@ echo ""
 
 # Read variables from JSON
 CATALOG_NAME=$(python3 -c "import json; print(json.load(open('$VARS_FILE'))['catalog_name'])")
+ENV_NAME=$(python3 -c "import json; print(json.load(open('$VARS_FILE'))['env'])")
 BASE_VOLUME_PATH=$(python3 -c "import json; print(json.load(open('$VARS_FILE'))['base_volume_path'])")
 ADMIN_VOLUME_PATH=$(python3 -c "import json; print(json.load(open('$VARS_FILE'))['admin_volume_path'])")
 
 echo "Configuration:"
+echo "  Environment:       $ENV_NAME"
 echo "  Catalog:           $CATALOG_NAME"
 echo "  Base Volume:       $BASE_VOLUME_PATH"
 echo "  Admin Volume:      $ADMIN_VOLUME_PATH"
@@ -88,6 +90,7 @@ with open('$job_file', 'r') as f:
 
 # Replace placeholders
 content = content.replace('{{CATALOG_NAME}}', '$CATALOG_NAME')
+content = content.replace('{{ENV}}', '$ENV_NAME')
 content = content.replace('{{BASE_VOLUME_PATH}}', '$BASE_VOLUME_PATH')
 content = content.replace('{{ADMIN_VOLUME_PATH}}', '$ADMIN_VOLUME_PATH')
 

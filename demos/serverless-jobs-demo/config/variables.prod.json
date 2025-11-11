@@ -1,5 +1,6 @@
 {
   "catalog_name": "prod",
+  "env": "prod",
   "base_volume_path": "/Volumes/prod/synthea/landing",
   "admin_volume_path": "/Volumes/prod/synthea/admin_configs"
 }

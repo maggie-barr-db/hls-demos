@@ -1,5 +1,15 @@
 {
   "name": "daily_silver_load_incr_serverless_api",
+  "parameters": [
+    {
+      "name": "PATH_LANDING",
+      "default": "abfss://landingzone@myadlsaccount_{{ENV}}.dfs.core.windows.net/"
+    },
+    {
+      "name": "PATH_DATALAKE",
+      "default": "abfss://datalake-{{ENV}}@myotheradlsaccount_{{ENV}}.dfs.core.windows.net/"
+    }
+  ],
   "tasks": [
     {
       "task_key": "load_claims_silver",
