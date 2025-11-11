@@ -80,7 +80,9 @@
           "spark.master": "local[*]"
         },
         "spark_env_vars": {
-          "catalog_name": "%CATALOG_NAME%"
+          "catalog_name": "%CATALOG_NAME%",
+          "PATH_LANDING": "abfss://landingzone@myadlsaccount_%ENV%.dfs.core.windows.net/",
+          "PATH_DATALAKE": "abfss://datalake-%ENV%@myotheradlsaccount_%ENV%.dfs.core.windows.net/"
         },
         "data_security_mode": "SINGLE_USER",
         "runtime_engine": "STANDARD",

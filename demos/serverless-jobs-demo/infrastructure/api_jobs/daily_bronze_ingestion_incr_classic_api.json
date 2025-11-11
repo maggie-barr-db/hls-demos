@@ -36,7 +36,9 @@
         },
         "spark_env_vars": {
           "catalog_name": "%CATALOG_NAME%",
-          "base_volume_path": "/Volumes/%CATALOG_NAME%/synthea/landing"
+          "base_volume_path": "/Volumes/%CATALOG_NAME%/synthea/landing",
+          "PATH_LANDING": "abfss://landingzone@myadlsaccount_%ENV%.dfs.core.windows.net/",
+          "PATH_DATALAKE": "abfss://datalake-%ENV%@myotheradlsaccount_%ENV%.dfs.core.windows.net/"
         },
         "data_security_mode": "SINGLE_USER",
         "runtime_engine": "STANDARD",
