@@ -17,9 +17,10 @@ The deployment system uses **template placeholders** in job JSON files that are 
 
 ### Placeholders
 
-- `{{CATALOG_NAME}}` - Unity Catalog name (e.g., dev, uat, prod)
-- `{{BASE_VOLUME_PATH}}` - Base volume path for data
-- `{{ADMIN_VOLUME_PATH}}` - Admin volume path for configs/libraries
+- `%CATALOG_NAME%` - Unity Catalog name (e.g., dev, uat, prod)
+- `%ENV%` - Environment name (e.g., dev, uat, prod)
+- `%BASE_VOLUME_PATH%` - Base volume path for data
+- `%ADMIN_VOLUME_PATH%` - Admin volume path for configs/libraries
 
 ## Directory Structure
 
@@ -108,13 +109,13 @@ Deploys volumes, uploads code, and creates all jobs using default config
    ```json
    {
      "spark_env_vars": {
-       "catalog_name": "{{CATALOG_NAME}}",
-       "base_volume_path": "{{BASE_VOLUME_PATH}}"
+       "catalog_name": "%CATALOG_NAME%",
+       "base_volume_path": "%BASE_VOLUME_PATH%"
      },
      "init_scripts": [
        {
          "volumes": {
-           "destination": "{{ADMIN_VOLUME_PATH}}/install_faker_wheel.sh"
+           "destination": "%ADMIN_VOLUME_PATH%/install_faker_wheel.sh"
          }
        }
      ]
@@ -136,12 +137,12 @@ Deploys volumes, uploads code, and creates all jobs using default config
   "job_clusters": [{
     "new_cluster": {
       "spark_env_vars": {
-        "catalog_name": "{{CATALOG_NAME}}",
-        "base_volume_path": "{{BASE_VOLUME_PATH}}"
+        "catalog_name": "%CATALOG_NAME%",
+        "base_volume_path": "%BASE_VOLUME_PATH%"
       },
       "init_scripts": [{
         "volumes": {
-          "destination": "{{ADMIN_VOLUME_PATH}}/install_faker_wheel.sh"
+          "destination": "%ADMIN_VOLUME_PATH%/install_faker_wheel.sh"
         }
       }]
     }

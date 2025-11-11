@@ -3,11 +3,11 @@
   "parameters": [
     {
       "name": "PATH_LANDING",
-      "default": "abfss://landingzone@myadlsaccount_{{ENV}}.dfs.core.windows.net/"
+      "default": "abfss://landingzone@myadlsaccount_%ENV%.dfs.core.windows.net/"
     },
     {
       "name": "PATH_DATALAKE",
-      "default": "abfss://datalake-{{ENV}}@myotheradlsaccount_{{ENV}}.dfs.core.windows.net/"
+      "default": "abfss://datalake-%ENV%@myotheradlsaccount_%ENV%.dfs.core.windows.net/"
     }
   ],
   "tasks": [
@@ -17,11 +17,11 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_claims",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "{{CATALOG_NAME}}",
+          "catalog_name": "%CATALOG_NAME%",
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     },
     {
       "task_key": "load_medications_silver",
@@ -29,11 +29,11 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_medications",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "{{CATALOG_NAME}}",
+          "catalog_name": "%CATALOG_NAME%",
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     },
     {
       "task_key": "load_patient_encounters_silver",
@@ -41,11 +41,11 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_patient_encounters",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "{{CATALOG_NAME}}",
+          "catalog_name": "%CATALOG_NAME%",
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     },
     {
       "task_key": "load_procedures_silver",
@@ -53,11 +53,11 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/silver/load_fact_procedures",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "{{CATALOG_NAME}}",
+          "catalog_name": "%CATALOG_NAME%",
           "load_type": "full"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     },
     {
       "task_key": "load_member_monthly_snapshot_gold",
@@ -80,11 +80,11 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "{{CATALOG_NAME}}"
+          "%CATALOG_NAME%"
         ]
       },
       "libraries": [],
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     }
   ],
   "queue": {
@@ -92,11 +92,11 @@
   },
   "environments": [
     {
-      "environment_key": "serverless_environment_demo",
+      "environment_key": "serverless_environment_v1",
       "spec": {
         "client": "4",
         "dependencies": [
-          "-r /Volumes/{{CATALOG_NAME}}/synthea/admin_configs/requirements.txt"
+          "-r /Volumes/%CATALOG_NAME%/synthea/admin_configs/requirements.txt"
         ]
       }
     }
@@ -106,7 +106,7 @@
     "timezone_id": "UTC",
     "pause_status": "PAUSED"
   },
-  "budget_policy_id": "{{USAGE_POLICY_ID}}",
+  "budget_policy_id": "%USAGE_POLICY_ID%",
   "max_concurrent_runs": 1,
   "format": "MULTI_TASK",
   "performance_target": "PERFORMANCE_OPTIMIZED"

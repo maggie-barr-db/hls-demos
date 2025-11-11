@@ -88,14 +88,14 @@ import sys
 with open('$job_file', 'r') as f:
     content = f.read()
 
-# Replace placeholders
-content = content.replace('{{CATALOG_NAME}}', '$CATALOG_NAME')
-content = content.replace('{{ENV}}', '$ENV_NAME')
-content = content.replace('{{BASE_VOLUME_PATH}}', '$BASE_VOLUME_PATH')
-content = content.replace('{{ADMIN_VOLUME_PATH}}', '$ADMIN_VOLUME_PATH')
+# Replace placeholders (using %...% syntax)
+content = content.replace('%CATALOG_NAME%', '$CATALOG_NAME')
+content = content.replace('%ENV%', '$ENV_NAME')
+content = content.replace('%BASE_VOLUME_PATH%', '$BASE_VOLUME_PATH')
+content = content.replace('%ADMIN_VOLUME_PATH%', '$ADMIN_VOLUME_PATH')
 
 # Remove any remaining budget policy placeholders
-content = content.replace('"budget_policy_id": "{{USAGE_POLICY_ID}}",', '')
+content = content.replace('"budget_policy_id": "%USAGE_POLICY_ID%",', '')
 
 with open('$TEMP_DIR/$job_file', 'w') as f:
     f.write(content)
