@@ -1,5 +1,15 @@
 {
   "name": "daily_bronze_ingestion_incr_serverless_api",
+  "parameters": [
+    {
+      "name": "PATH_LANDING",
+      "default": "abfss://landingzone@myadlsaccount_%ENV%.dfs.core.windows.net/"
+    },
+    {
+      "name": "PATH_DATALAKE",
+      "default": "abfss://datalake-%ENV%@myotheradlsaccount_%ENV%.dfs.core.windows.net/"
+    }
+  ],
   "tasks": [
     {
       "task_key": "bronze_ingest",
@@ -7,11 +17,11 @@
         "notebook_path": "/Workspace/Shared/hls-demos/demos/serverless-jobs-demo/src/serverless/bronze/bronze_ingest",
         "source": "WORKSPACE",
         "base_parameters": {
-          "catalog_name": "{{CATALOG_NAME}}",
-          "base_volume_path": "/Volumes/{{CATALOG_NAME}}/synthea/landing"
+          "catalog_name": "%CATALOG_NAME%",
+          "base_volume_path": "/Volumes/%CATALOG_NAME%/synthea/landing"
         }
       },
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     },
     {
       "task_key": "bronze_archive",
@@ -25,12 +35,12 @@
         "source": "WORKSPACE",
         "parameters": [
           "--catalog_name",
-          "{{CATALOG_NAME}}",
+          "%CATALOG_NAME%",
           "--base_volume_path",
-          "/Volumes/{{CATALOG_NAME}}/synthea/landing"
+          "/Volumes/%CATALOG_NAME%/synthea/landing"
         ]
       },
-      "environment_key": "serverless_environment_demo"
+      "environment_key": "serverless_environment_v1"
     }
   ],
   "queue": {
@@ -38,11 +48,11 @@
   },
   "environments": [
     {
-      "environment_key": "serverless_environment_demo",
+      "environment_key": "serverless_environment_v1",
       "spec": {
         "client": "4",
         "dependencies": [
-          "-r /Volumes/{{CATALOG_NAME}}/synthea/admin_configs/requirements.txt"
+          "-r /Volumes/%CATALOG_NAME%/synthea/admin_configs/requirements.txt"
         ]
       }
     }
@@ -52,7 +62,7 @@
     "timezone_id": "UTC",
     "pause_status": "PAUSED"
   },
-  "budget_policy_id": "{{USAGE_POLICY_ID}}",
+  "budget_policy_id": "%USAGE_POLICY_ID%",
   "max_concurrent_runs": 1,
   "format": "MULTI_TASK",
   "performance_target": "PERFORMANCE_OPTIMIZED"

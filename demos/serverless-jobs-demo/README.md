@@ -98,17 +98,17 @@ The project uses template placeholders for multi-environment deployment:
 ```json
 {
   "spark_env_vars": {
-    "catalog_name": "{{CATALOG_NAME}}"
+    "catalog_name": "%CATALOG_NAME%"
   },
   "init_scripts": [{
     "volumes": {
-      "destination": "/Volumes/{{CATALOG_NAME}}/synthea/admin_configs/install_faker_wheel.sh"
+      "destination": "/Volumes/%CATALOG_NAME%/synthea/admin_configs/install_faker_wheel.sh"
     }
   }]
 }
 ```
 
-At deployment time, `{{CATALOG_NAME}}` is replaced with environment-specific values.
+At deployment time, `%CATALOG_NAME%` is replaced with environment-specific values.
 
 ## 🌍 Multi-Environment Support
 
